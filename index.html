@@ -35,18 +35,20 @@
     .brief-info-sub { font-size:12px; color:#999; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .brief-arrow { font-size:16px; color:#ccc; flex-shrink:0; }
 
-    /* Month grid */
+    /* Month grid — 改成石板藍灰色系 */
     .month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
     .month-card {
-      background:#1b2d4f; border-radius:12px; padding:16px 14px 14px;
+      background:#4a5e72;
+      border-radius:12px; padding:16px 14px 14px;
       cursor:pointer; position:relative; overflow:hidden;
       transition:background .15s, transform .12s, box-shadow .12s;
       border:2px solid transparent;
     }
-    .month-card::before { content:''; position:absolute; top:-24px; right:-24px; width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,0.05); pointer-events:none; }
-    .month-card:hover { background:#253d68; transform:translateY(-2px); box-shadow:0 6px 20px rgba(27,45,79,0.25); }
-    .month-card.active { border-color:#6ea3f7; background:#253d68; box-shadow:0 0 0 3px rgba(110,163,247,0.2); }
-    .month-card--current { background:#243b60; }
+    .month-card::before { content:''; position:absolute; top:-24px; right:-24px; width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,0.06); pointer-events:none; }
+    .month-card:hover { background:#566a7f; transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,94,114,0.35); }
+    .month-card.active { border-color:#93c5fd; background:#566a7f; box-shadow:0 0 0 3px rgba(147,197,253,0.2); }
+    .month-card--current { background:#3e5568; }
+    .month-card--current:hover { background:#4a6378; }
     .month-card-ongoing {
       display:inline-flex; align-items:center; gap:4px;
       background:rgba(110,211,130,0.18); border:1px solid rgba(110,211,130,0.4);
@@ -55,9 +57,9 @@
     }
     .month-card-ongoing::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-    .month-card-year { font-size:10px; color:rgba(255,255,255,0.4); letter-spacing:0.08em; margin-bottom:4px; }
+    .month-card-year { font-size:10px; color:rgba(255,255,255,0.45); letter-spacing:0.08em; margin-bottom:4px; }
     .month-card-name { font-size:20px; font-weight:800; color:#fff; line-height:1; }
-    .month-card-count { display:inline-block; margin-top:10px; background:rgba(255,255,255,0.12); border-radius:20px; padding:2px 9px; font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; }
+    .month-card-count { display:inline-block; margin-top:10px; background:rgba(255,255,255,0.14); border-radius:20px; padding:2px 9px; font-size:11px; color:rgba(255,255,255,0.75); font-weight:600; }
 
     /* Month panels */
     .month-panel { display:none; background:#fff; border-radius:16px; padding:22px 28px 24px; box-shadow:0 8px 40px rgba(0,0,0,0.07); margin-top:14px; }
@@ -100,7 +102,7 @@
     <div class="section-card">
       <div class="section-label">歷史簡報</div>
       <div class="month-grid">
-        <div class="month-card  month-card--current" data-month="2026-04" onclick="toggleMonth('2026-04')">
+        <div class="month-card month-card--current" data-month="2026-04" onclick="toggleMonth('2026-04')">
           <div class="month-card-ongoing">進行中</div>
           <div class="month-card-year">2026</div>
           <div class="month-card-name">四月</div>
