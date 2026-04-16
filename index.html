@@ -9,7 +9,6 @@
     body { background:#f0ede8; font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color:#1a1a1a; min-height:100vh; padding:32px 16px 64px; }
     .container { max-width:680px; margin:0 auto; }
 
-    /* Hero */
     .hero { background:#1b2d4f; border-radius:16px; padding:40px 40px 32px; position:relative; overflow:hidden; margin-bottom:20px; }
     .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
     .hero-animal { position:absolute; top:24px; right:28px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }
@@ -19,11 +18,9 @@
     .hero-cta { display:inline-block; margin-top:24px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:600; transition:background .15s; }
     .hero-cta:hover { background:rgba(255,255,255,0.2); }
 
-    /* Section cards */
     .section-card { background:#fff; border-radius:16px; padding:28px 36px 28px; box-shadow:0 8px 40px rgba(0,0,0,0.07); margin-bottom:20px; }
     .section-label { font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#aaa; margin-bottom:16px; padding-bottom:10px; border-bottom:1.5px solid #f0ede8; }
 
-    /* Brief rows */
     .brief-row { display:flex; align-items:center; gap:14px; padding:11px 8px; border-bottom:1px solid #f8f6f3; text-decoration:none; color:inherit; border-radius:8px; margin:0 -8px; transition:background .12s; }
     .brief-row:hover { background:#f8f6f2; }
     .brief-row:last-child { border-bottom:none; }
@@ -35,16 +32,13 @@
     .brief-info-sub { font-size:12px; color:#999; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .brief-arrow { font-size:16px; color:#ccc; flex-shrink:0; }
 
-    /* Month grid — 改成石板藍灰色系 */
     .month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
     .month-card {
-      background:#4a5e72;
-      border-radius:12px; padding:16px 14px 14px;
+      background:#4a5e72; border-radius:12px; padding:16px 14px 14px;
       cursor:pointer; position:relative; overflow:hidden;
       transition:background .15s, transform .12s, box-shadow .12s;
       border:2px solid transparent;
     }
-    .month-card::before { content:''; position:absolute; top:-24px; right:-24px; width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,0.06); pointer-events:none; }
     .month-card:hover { background:#566a7f; transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,94,114,0.35); }
     .month-card.active { border-color:#93c5fd; background:#566a7f; box-shadow:0 0 0 3px rgba(147,197,253,0.2); }
     .month-card--current { background:#3e5568; }
@@ -53,15 +47,14 @@
       display:inline-flex; align-items:center; gap:4px;
       background:rgba(110,211,130,0.18); border:1px solid rgba(110,211,130,0.4);
       border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700;
-      color:#7de89a; letter-spacing:0.04em; margin-bottom:8px;
+      color:#7de89a; letter-spacing:0.04em; margin-bottom:6px;
     }
     .month-card-ongoing::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-    .month-card-year { font-size:10px; color:rgba(255,255,255,0.45); letter-spacing:0.08em; margin-bottom:4px; }
-    .month-card-name { font-size:20px; font-weight:800; color:#fff; line-height:1; }
-    .month-card-count { display:inline-block; margin-top:10px; background:rgba(255,255,255,0.14); border-radius:20px; padding:2px 9px; font-size:11px; color:rgba(255,255,255,0.75); font-weight:600; }
+    .month-card-icon { font-size:22px; line-height:1; margin-bottom:6px; }
+    .month-card-name { font-size:18px; font-weight:800; color:#fff; line-height:1; }
+    .month-card-count { display:inline-block; margin-top:8px; background:rgba(255,255,255,0.14); border-radius:20px; padding:2px 9px; font-size:11px; color:rgba(255,255,255,0.75); font-weight:600; }
 
-    /* Month panels */
     .month-panel { display:none; background:#fff; border-radius:16px; padding:22px 28px 24px; box-shadow:0 8px 40px rgba(0,0,0,0.07); margin-top:14px; }
     .month-panel.open { display:block; animation:fadeSlide .2s ease; }
     @keyframes fadeSlide { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
@@ -75,7 +68,6 @@
 </head>
 <body>
   <div class="container">
-
     <div class="hero">
       <div class="hero-animal">🦔</div>
       <div class="hero-label">柚子 Daily Brief</div>
@@ -104,7 +96,7 @@
       <div class="month-grid">
         <div class="month-card month-card--current" data-month="2026-04" onclick="toggleMonth('2026-04')">
           <div class="month-card-ongoing">進行中</div>
-          <div class="month-card-year">2026</div>
+          <div class="month-card-icon">🌿</div>
           <div class="month-card-name">四月</div>
           <div class="month-card-count">1篇</div>
         </div>
