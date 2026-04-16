@@ -1,293 +1,70 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>每日簡報｜2026年4月16日</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: #f0ede8;
-      font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-      color: #1a1a1a;
-      min-height: 100vh;
-      padding: 32px 16px 64px;
-    }
-
-    .container {
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    /* ── Header ── */
-    .header {
-      background: #1b2d4f;
-      border-radius: 16px 16px 0 0;
-      padding: 34px 40px 28px;
-      position: relative;
-      overflow: hidden;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 220px; height: 220px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      pointer-events: none;
-    }
-
-    /* Animal sits top-right, absolutely positioned */
-    .animal-badge {
-      position: absolute;
-      top: 22px;
-      right: 26px;
-      width: 82px;
-      height: 82px;
-      background: rgba(255,255,255,0.09);
-      border: 1.5px solid rgba(255,255,255,0.14);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 50px;
-      line-height: 1;
-    }
-
-    /* Date area has right padding so it never overlaps the animal */
-    .header-text {
-      padding-right: 90px;
-    }
-    .date-main {
-      font-size: 28px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-    }
-    .weekday-row {
-      margin-top: 10px;
-    }
-    .weekday-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.13);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 20px;
-      padding: 3px 13px;
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.72);
-      letter-spacing: 0.05em;
-    }
-    .header-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.1);
-      margin: 16px 0 12px;
-    }
-    .header-tagline {
-      font-size: 13px;
-      color: rgba(255,255,255,0.36);
-      letter-spacing: 0.04em;
-    }
-
-    /* ── Body card ── */
-    .body-card {
-      background: #fff;
-      border-radius: 0 0 16px 16px;
-      padding: 36px 40px 40px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.08);
-    }
-
-    /* ── Section ── */
-    .section { margin-bottom: 40px; }
-    .section:last-child { margin-bottom: 0; }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 22px;
-      padding-bottom: 14px;
-      border-bottom: 1.5px solid #f0ede8;
-    }
-    .section-icon { font-size: 18px; line-height: 1; }
-    .section-title {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #888;
-    }
-
-    /* ── News items ── */
-    .news-item {
-      display: flex;
-      gap: 18px;
-      padding: 18px 0;
-      border-bottom: 1px solid #f5f3f0;
-    }
-    .news-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .news-item:first-child { padding-top: 0; }
-
-    .news-number {
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      background: #1b2d4f;
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 2px;
-    }
-    .news-content { flex: 1; }
-    .news-title {
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.4;
-      color: #111;
-      margin-bottom: 7px;
-    }
-    .news-body {
-      font-size: 14px;
-      line-height: 1.75;
-      color: #444;
-    }
-
-    /* ── Fun fact ── */
-    .fact-card {
-      background: linear-gradient(135deg, #fffbf0 0%, #fff8e1 100%);
-      border: 1.5px solid #ffe082;
-      border-radius: 12px;
-      padding: 22px 24px;
-      position: relative;
-      overflow: hidden;
-    }
-    .fact-card::before {
-      content: '💡';
-      position: absolute;
-      right: 20px;
-      top: 16px;
-      font-size: 28px;
-      opacity: 0.3;
-    }
-    .fact-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #7a5c00;
-      margin-bottom: 8px;
-    }
-    .fact-body {
-      font-size: 14px;
-      line-height: 1.75;
-      color: #5a4200;
-    }
-
-    /* ── Footer ── */
-    .footer {
-      text-align: center;
-      margin-top: 28px;
-      font-size: 12px;
-      color: #bbb;
-      letter-spacing: 0.05em;
-    }
+    body { background: #f0ede8; font-family: -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color: #1a1a1a; min-height: 100vh; padding: 32px 16px 64px; }
+    .container { max-width: 680px; margin: 0 auto; }
+    .header { background: #1b2d4f; border-radius: 16px 16px 0 0; padding: 34px 40px 28px; position: relative; overflow: hidden; }
+    .header::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
+    .animal-badge { position:absolute; top:22px; right:26px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }
+    .header-text { padding-right: 100px; }
+    .date-main { font-size:28px; font-weight:700; color:#fff; line-height:1.2; letter-spacing:-0.01em; white-space:nowrap; }
+    .weekday-row { margin-top:10px; }
+    .weekday-badge { display:inline-block; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:3px 13px; font-size:13px; font-weight:600; color:rgba(255,255,255,0.72); letter-spacing:0.05em; }
+    .header-divider { height:1px; background:rgba(255,255,255,0.1); margin:16px 0 12px; }
+    .header-tagline { font-size:13px; color:rgba(255,255,255,0.36); letter-spacing:0.04em; }
+    .body-card { background:#fff; border-radius:0 0 16px 16px; padding:36px 40px 40px; box-shadow:0 8px 40px rgba(0,0,0,0.08); }
+    .section { margin-bottom:40px; }
+    .section:last-child { margin-bottom:0; }
+    .section-header { display:flex; align-items:center; gap:10px; margin-bottom:22px; padding-bottom:14px; border-bottom:1.5px solid #f0ede8; }
+    .section-icon { font-size:18px; line-height:1; }
+    .section-title { font-size:13px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#888; }
+    .news-item { display:flex; gap:18px; padding:18px 0; border-bottom:1px solid #f5f3f0; }
+    .news-item:last-child { border-bottom:none; padding-bottom:0; }
+    .news-item:first-child { padding-top:0; }
+    .news-number { flex-shrink:0; width:28px; height:28px; background:#1b2d4f; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; margin-top:2px; }
+    .news-content { flex:1; }
+    .news-title { font-size:15px; font-weight:700; line-height:1.4; color:#111; margin-bottom:7px; }
+    .news-body { font-size:14px; line-height:1.75; color:#444; }
+    .fact-card { background:linear-gradient(135deg,#fffbf0 0%,#fff8e1 100%); border:1.5px solid #ffe082; border-radius:12px; padding:22px 24px; position:relative; overflow:hidden; }
+    .fact-card::before { content:'💡'; position:absolute; right:20px; top:16px; font-size:28px; opacity:0.3; }
+    .fact-title { font-size:14px; font-weight:700; color:#7a5c00; margin-bottom:8px; }
+    .fact-body { font-size:14px; line-height:1.75; color:#5a4200; }
+    .footer { text-align:center; margin-top:28px; font-size:12px; color:#bbb; letter-spacing:0.05em; }
   </style>
 </head>
 <body>
   <div class="container">
-
-    <!-- Header -->
     <div class="header">
-
-      <!-- Daily rotating animal (Thu = 🐸) -->
       <div class="animal-badge">🦔</div>
-
       <div class="header-text">
         <div class="date-main">2026年4月16日</div>
-        <div class="weekday-row">
-          <span class="weekday-badge">星期四</span>
-        </div>
+        <div class="weekday-row"><span class="weekday-badge">星期四</span></div>
         <div class="header-divider"></div>
         <div class="header-tagline">用五分鐘，掌握今天的世界</div>
       </div>
-
     </div>
-
-    <!-- Body -->
     <div class="body-card">
-
-      <!-- 全球新聞 -->
       <div class="section">
-        <div class="section-header">
-          <span class="section-icon">🌍</span>
-          <span class="section-title">全球五大新聞</span>
-        </div>
-
-        <div class="news-item">
-          <div class="news-number">1</div>
-          <div class="news-content">
-            <div class="news-title">匈牙利政壇大地震：Magyar 終結 Orbán 16 年執政</div>
-            <div class="news-body">反對黨「Tisza黨」領袖佩特爾·馬扎爾以53.6%得票率大獲全勝，贏得199席中的138席，取得修憲所需的三分之二絕對多數。此次選舉投票率突破77%，創後共產主義時代歷史新高，被分析人士視為2026年歐盟最重要的選舉。長期被視為威權主義代表人物、且與俄羅斯關係密切的奧班當晚即承認敗選，標誌著匈牙利政治走向歐盟主流路線的重大轉折。</div>
-          </div>
-        </div>
-
-        <div class="news-item">
-          <div class="news-number">2</div>
-          <div class="news-content">
-            <div class="news-title">美伊緊張升級：荷莫茲海峽封鎖全面落實，油價飆漲</div>
-            <div class="news-body">美國海軍宣布對伊朗所有港口實施的海上封鎖已於4月13日正式生效，出動超過1萬名士兵、逾12艘艦艇及戰鬥機執行。中國外交部強烈譴責此行動「危險且不負責任」，伊朗則稱之為「海盜行為」。由於荷莫茲海峽承載全球約20%的石油與天然氣貿易，布蘭特原油價格已單日飆漲逾10%，逼近100美元大關。</div>
-          </div>
-        </div>
-
-        <div class="news-item">
-          <div class="news-number">3</div>
-          <div class="news-content">
-            <div class="news-title">秘魯大選：選票延誤，結果懸而未決</div>
-            <div class="news-body">秘魯總統大選因大批投票站選票未能及時送達，選舉當局被迫將投票時間延長一天。截至週一深夜，秘魯仍無法公布正式選舉結果，全國陷入不確定狀態。結果延誤已引發部分民眾對選舉公正性的疑慮，各方候選人陣營均密切觀察後續發展。</div>
-          </div>
-        </div>
-
-        <div class="news-item">
-          <div class="news-number">4</div>
-          <div class="news-content">
-            <div class="news-title">阿提密斯二號：人類創下史上最遠離地球距離紀錄</div>
-            <div class="news-body">NASA阿提密斯二號任務於4月1日升空，搭載四名太空人成功繞行月球背面，最遠距地球達406,773公里，打破人類離地最遠紀錄。此次任務也是史上首次由非裔、女性及非美籍太空人一同飛越近地軌道，是人類太空探索史上的重要里程碑。</div>
-          </div>
-        </div>
-
-        <div class="news-item">
-          <div class="news-number">5</div>
-          <div class="news-content">
-            <div class="news-title">聯合國啟動 AI 全球影響力研究</div>
-            <div class="news-body">聯合國獨立國際人工智慧科學小組正式展開首次面對面峰會，任務是評估AI對全球社會的影響，並在技術創新與倫理規範之間尋求平衡。這一全球AI治理新框架的啟動，反映出國際社會對AI快速擴張後的監管需求日益迫切。</div>
-          </div>
-        </div>
+        <div class="section-header"><span class="section-icon">🌍</span><span class="section-title">全球五大新聞</span></div>
+        <div class="news-item"><div class="news-number">1</div><div class="news-content"><div class="news-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div><div class="news-body">美國與伊朗首輪停火談判於巴基斯坦伊斯蘭馬巴德破裂，副總統萬斯表示伊朗拒絕接受美方條件，雙方僵持逾21小時無果而終。停火協議將於4月21日到期，巴基斯坦、埃及、土耳其三國正積極居中調解，力圖在截止日前促成第二輪會談。核武計畫、荷莫茲海峽開放與伊朗凍結資產金額，仍是三大核心爭議。</div></div></div>
+        <div class="news-item"><div class="news-number">2</div><div class="news-content"><div class="news-title">以色列與黎巴嫩34年來首次高層對話，川普居中促成歷史突破</div><div class="news-body">川普宣布以色列總理內塔尼亞胡與黎巴嫩總統奧恩將於周四進行通話，這是兩國領導人34年來首度直接對話。此前美、以、黎三方在美國舉行的高層會議已達成「展開直接和平談判」的初步共識，由國務卿魯比奧主持斡旋。黎巴嫩真主黨呼籲政府拒絕參與，稱談判「毫無意義」，但各方仍持審慎樂觀態度。</div></div></div>
+        <div class="news-item"><div class="news-number">3</div><div class="news-content"><div class="news-title">俄羅斯以逾660架無人機猛攻烏克蘭，復活節停火旋即破局</div><div class="news-body">俄羅斯於復活節後發動年內規模最大的聯合攻擊，在24小時內向烏克蘭發射逾660架無人機及44枚巡弋與彈道飛彈，造成至少18人死亡，包含一名12歲兒童。基輔、敖德薩、第聶伯羅、扎波羅熱等多個城市遭受打擊，一艘米克羅尼西亞籍貨輪在黑海港口被擊中起火。澤倫斯基正緊急出訪各盟國，懇請提供更多防空武器。</div></div></div>
+        <div class="news-item"><div class="news-number">4</div><div class="news-content"><div class="news-title">美股創歷史新高，S&amp;P 500與那斯達克兩週內抹平所有跌幅</div><div class="news-body">美國股市強勁反彈，S&amp;P 500指數與那斯達克綜合指數雙雙刷新歷史高點，兩週之內完全收復因美伊戰爭引發的全部跌幅。投資人對停火談判抱持樂觀預期，加上人工智慧板塊持續撐盤，推動市場信心回升。儘管關稅戰陰影未散，市場在中東局勢降溫預期下率先展現韌性。</div></div></div>
+        <div class="news-item"><div class="news-number">5</div><div class="news-content"><div class="news-title">📌 更新：IMF最新展望——中東戰火籠罩下全球成長率降至3.1%</div><div class="news-body">國際貨幣基金發布4月《世界經濟展望》，副標題為「戰爭陰影下的全球經濟」，將2026年全球經濟成長率下調至3.1%。中東衝突帶動大宗商品價格上揚，通膨預期升溫，金融環境趨緊，成為繼關稅戰之後的另一主要風險來源。IMF同時警告，若局勢持續升溫，多國供應鏈與能源安全將承受更大壓力。</div></div></div>
       </div>
-
-      <!-- 冷知識 -->
       <div class="section">
-        <div class="section-header">
-          <span class="section-icon">🧠</span>
-          <span class="section-title">每日冷知識</span>
-        </div>
-        <div class="fact-card">
-          <div class="fact-title">哺乳動物的祖先曾經產卵？</div>
-          <div class="fact-body">科學家描述了史上首個非哺乳類合弓類動物的胚胎化石，屬於距今約2.5億年的水龍獸（Lystrosaurus）。這項發現直接印證了長期以來的假說：現代哺乳動物的遠古祖先並非胎生，而是像爬行類一樣產卵。換句話說，你的老祖宗曾經是靠破殼而生的！</div>
-        </div>
+        <div class="section-header"><span class="section-icon">🧠</span><span class="section-title">每日冷知識</span></div>
+        <div class="fact-card"><div class="fact-title">今晚流星劃過天際——人類觀測史上最古老的流星雨今日登場</div><div class="fact-body">天琴座流星雨（Lyrids）於每年4月16日至25日間活躍，今天正式開始，高峰落在4月21至22日清晨。這場流星雨有超過2,500年的觀測紀錄，是人類已知最古老的流星雨之一。流星來自彗星「撒切爾」（C/1861 G1）留下的塵埃帶——這顆彗星繞太陽一圈需要約415年。平均每小時可見15至20顆，但歷史上偶發「爆發」可達每小時百顆，加上今年無月黑夜，是難得的絕佳觀測年份。</div></div>
       </div>
-
     </div>
-
-    <!-- Footer -->
     <div class="footer">
-      <a href="index.html" style="color:#bbb;text-decoration:none;">← 返回所有簡報</a> &nbsp;·&nbsp; 柚子 Daily Brief &nbsp;·&nbsp; 2026.04.16
+      <a href="index.html" style="color:#bbb;text-decoration:none;">← 返回所有簡報</a> &nbsp;·&nbsp; 柚子 Daily Brief &nbsp;·&nbsp; 2026-04-16
     </div>
-
   </div>
 </body>
 </html>
