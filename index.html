@@ -8,26 +8,61 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background:#f0ede8; font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color:#1a1a1a; min-height:100vh; padding:32px 16px 64px; }
     .container { max-width:680px; margin:0 auto; }
-    .hero { background:#1b2d4f; border-radius:16px; padding:40px 40px 32px; position:relative; overflow:hidden; margin-bottom:24px; }
-    .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); }
+
+    .hero { background:#1b2d4f; border-radius:16px; padding:40px 40px 32px; position:relative; overflow:hidden; margin-bottom:20px; }
+    .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
     .hero-animal { position:absolute; top:24px; right:28px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }
     .hero-label { font-size:12px; letter-spacing:0.15em; color:rgba(255,255,255,0.4); text-transform:uppercase; margin-bottom:12px; }
     .hero-title { font-size:32px; font-weight:800; color:#fff; line-height:1.1; padding-right:100px; }
     .hero-sub { font-size:14px; color:rgba(255,255,255,0.45); margin-top:10px; padding-right:100px; }
-    .hero-cta { display:inline-block; margin-top:24px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:600; }
-    .archive-card { background:#fff; border-radius:16px; padding:28px 36px 32px; box-shadow:0 8px 40px rgba(0,0,0,0.07); }
-    .month-group { margin-bottom:28px; }
-    .month-group:last-child { margin-bottom:0; }
-    .month-label { font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#aaa; margin-bottom:12px; padding-bottom:10px; border-bottom:1.5px solid #f0ede8; }
-    .brief-row { display:flex; align-items:center; gap:14px; padding:11px 8px; border-bottom:1px solid #f8f6f3; text-decoration:none; color:inherit; border-radius:8px; margin:0 -8px; }
+    .hero-cta { display:inline-block; margin-top:24px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:600; transition:background .15s; }
+    .hero-cta:hover { background:rgba(255,255,255,0.2); }
+
+    .section-card { background:#fff; border-radius:16px; padding:28px 36px 28px; box-shadow:0 8px 40px rgba(0,0,0,0.07); margin-bottom:20px; }
+    .section-label { font-size:12px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#aaa; margin-bottom:16px; padding-bottom:10px; border-bottom:1.5px solid #f0ede8; }
+
+    .brief-row { display:flex; align-items:center; gap:14px; padding:11px 8px; border-bottom:1px solid #f8f6f3; text-decoration:none; color:inherit; border-radius:8px; margin:0 -8px; transition:background .12s; }
+    .brief-row:hover { background:#f8f6f2; }
     .brief-row:last-child { border-bottom:none; }
     .brief-date-badge { flex-shrink:0; width:46px; height:46px; background:#1b2d4f; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; }
     .badge-day { font-size:18px; font-weight:700; line-height:1; }
     .badge-weekday { font-size:10px; color:rgba(255,255,255,0.55); margin-top:2px; }
-    .brief-info { flex:1; }
-    .brief-info-title { font-size:14px; font-weight:600; color:#111; line-height:1.3; }
-    .brief-info-sub { font-size:12px; color:#999; margin-top:3px; }
+    .brief-info { flex:1; min-width:0; }
+    .brief-info-title { font-size:14px; font-weight:600; color:#111; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .brief-info-sub { font-size:12px; color:#999; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .brief-arrow { font-size:16px; color:#ccc; flex-shrink:0; }
+
+    .month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .month-card {
+      background:#4a5e72; border-radius:12px; padding:16px 14px 14px;
+      cursor:pointer; position:relative; overflow:hidden;
+      transition:background .15s, transform .12s, box-shadow .12s;
+      border:2px solid transparent;
+    }
+    .month-card:hover { background:#566a7f; transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,94,114,0.35); }
+    .month-card.active { border-color:#93c5fd; background:#566a7f; box-shadow:0 0 0 3px rgba(147,197,253,0.2); }
+    .month-card--current { background:#3e5568; }
+    .month-card--current:hover { background:#4a6378; }
+    .month-card-ongoing {
+      display:inline-flex; align-items:center; gap:4px;
+      background:rgba(110,211,130,0.18); border:1px solid rgba(110,211,130,0.4);
+      border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700;
+      color:#7de89a; letter-spacing:0.04em; margin-bottom:6px;
+    }
+    .month-card-ongoing::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    .month-card-icon { font-size:22px; line-height:1; margin-bottom:6px; }
+    .month-card-name { font-size:18px; font-weight:800; color:#fff; line-height:1; }
+    .month-card-count { display:inline-block; margin-top:8px; background:rgba(255,255,255,0.14); border-radius:20px; padding:2px 9px; font-size:11px; color:rgba(255,255,255,0.75); font-weight:600; }
+
+    .month-panel { display:none; background:#fff; border-radius:16px; padding:22px 28px 24px; box-shadow:0 8px 40px rgba(0,0,0,0.07); margin-top:14px; }
+    .month-panel.open { display:block; animation:fadeSlide .2s ease; }
+    @keyframes fadeSlide { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .month-panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:10px; border-bottom:1.5px solid #f0ede8; }
+    .month-panel-title { font-size:14px; font-weight:700; color:#1b2d4f; }
+    .month-panel-close { background:none; border:1px solid #e0ddd8; border-radius:20px; padding:4px 12px; font-size:12px; color:#999; cursor:pointer; transition:all .12s; }
+    .month-panel-close:hover { background:#f0ede8; color:#555; }
+
     .footer { text-align:center; margin-top:28px; font-size:12px; color:#bbb; letter-spacing:0.05em; }
   </style>
 </head>
@@ -40,22 +75,94 @@
       <div class="hero-sub">每日精選五則全球要聞 × 一則冷知識</div>
       <a href="2026-04-17.html" class="hero-cta">閱讀今日簡報 →</a>
     </div>
-    <div class="archive-card">
-      <div class="month-group">
-        <div class="month-label">2026年 四月</div>
-        <a href="2026-04-17.html" class="brief-row">
-          <div class="brief-date-badge"><div class="badge-day">17</div><div class="badge-weekday">週五</div></div>
-          <div class="brief-info"><div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div><div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法案：47比52票維持川普開戰權 · 俄羅斯夜襲基輔：數百架無人機與數十枚飛彈，烏克蘭16死</div></div>
+
+    <div class="section-card">
+      <div class="section-label">最近 14 天</div>
+      <a href="2026-04-17.html" class="brief-row">
+          <div class="brief-date-badge">
+            <div class="badge-day">17</div>
+            <div class="badge-weekday">週五</div>
+          </div>
+          <div class="brief-info">
+            <div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div>
+            <div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法… · 俄羅斯夜襲基輔：數百架無人機與…</div>
+          </div>
           <div class="brief-arrow">›</div>
         </a>
-        <a href="2026-04-16.html" class="brief-row">
-          <div class="brief-date-badge"><div class="badge-day">16</div><div class="badge-weekday">週四</div></div>
-          <div class="brief-info"><div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div><div class="brief-info-sub">以色列與黎巴嫩34年來首次高層對話，川普居中促成歷史突破 · 俄羅斯以逾660架無人機猛攻烏克蘭，復活節停火旋即破局</div></div>
+      <a href="2026-04-16.html" class="brief-row">
+          <div class="brief-date-badge">
+            <div class="badge-day">16</div>
+            <div class="badge-weekday">週四</div>
+          </div>
+          <div class="brief-info">
+            <div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div>
+            <div class="brief-info-sub">以色列與黎巴嫩34年來首次高層… · 俄羅斯以逾660架無人機猛攻烏…</div>
+          </div>
           <div class="brief-arrow">›</div>
         </a>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label">歷史簡報</div>
+      <div class="month-grid">
+        <div class="month-card month-card--current" data-month="2026-04" onclick="toggleMonth('2026-04')">
+          <div class="month-card-ongoing">進行中</div>
+          <div class="month-card-icon">🌿</div>
+          <div class="month-card-name">四月</div>
+          <div class="month-card-count">2篇</div>
+        </div>
       </div>
     </div>
+
+    <div class="month-panel" id="panel-2026-04">
+      <div class="month-panel-header">
+        <span class="month-panel-title">2026年4月</span>
+        <button class="month-panel-close" onclick="toggleMonth('2026-04')">✕ 收起</button>
+      </div>
+      <a href="2026-04-17.html" class="brief-row">
+          <div class="brief-date-badge">
+            <div class="badge-day">17</div>
+            <div class="badge-weekday">週五</div>
+          </div>
+          <div class="brief-info">
+            <div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div>
+            <div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法… · 俄羅斯夜襲基輔：數百架無人機與…</div>
+          </div>
+          <div class="brief-arrow">›</div>
+        </a>
+      <a href="2026-04-16.html" class="brief-row">
+          <div class="brief-date-badge">
+            <div class="badge-day">16</div>
+            <div class="badge-weekday">週四</div>
+          </div>
+          <div class="brief-info">
+            <div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div>
+            <div class="brief-info-sub">以色列與黎巴嫩34年來首次高層… · 俄羅斯以逾660架無人機猛攻烏…</div>
+          </div>
+          <div class="brief-arrow">›</div>
+        </a>
+    </div>
+
+
     <div class="footer">柚子 Daily Brief &nbsp;·&nbsp; 每日自動更新</div>
   </div>
+
+  <script>
+    let activeMonth = null;
+    function toggleMonth(key) {
+      const card = document.querySelector('.month-card[data-month="' + key + '"]');
+      const panel = document.getElementById('panel-' + key);
+      if (!card || !panel) return;
+      if (activeMonth && activeMonth !== key) {
+        document.querySelector('.month-card[data-month="' + activeMonth + '"]')?.classList.remove('active');
+        document.getElementById('panel-' + activeMonth)?.classList.remove('open');
+      }
+      const isOpen = panel.classList.contains('open');
+      card.classList.toggle('active', !isOpen);
+      panel.classList.toggle('open', !isOpen);
+      activeMonth = isOpen ? null : key;
+      if (!isOpen) setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+    }
+  </script>
 </body>
 </html>
