@@ -360,7 +360,9 @@ def build_index_html(repo_dir):
     .month-panel-title {{ font-size:14px; font-weight:700; color:#1b2d4f; }}
     .month-panel-close {{ background:none; border:none; cursor:pointer; font-size:12px; color:#999; padding:4px 8px; border-radius:6px; }}
     .month-panel-close:hover {{ background:#f0ede8; }}
-    /* Dashboard link */
+    /* Dashboard button */
+    .dashboard-btn {{ position:fixed; bottom:24px; right:24px; background:#1b2d4f; color:#fff; text-decoration:none; padding:12px 20px; border-radius:30px; font-size:13px; font-weight:700; box-shadow:0 4px 16px rgba(0,0,0,0.25); transition:background .15s,transform .12s; z-index:999; display:flex; align-items:center; gap:8px; }}
+    .dashboard-btn:hover {{ background:#243d6a; transform:translateY(-2px); }}
     .empty-hint {{ color:#bbb; font-size:13px; padding:16px 8px; }}
     .footer {{ text-align:center; margin-top:24px; font-size:12px; color:#bbb; }}
   </style>
