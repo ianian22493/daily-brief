@@ -1,0 +1,39 @@
+name: 每日新聞簡報
+
+on:
+  # 每天 01:00 UTC = 台灣時間 09:00
+  schedule:
+    - cron: '0 1 * * *'
+  # 手動觸發（測試用）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安裝依賴
+        run: pip install google-generativeai
+
+      - name: 生成今日簡報
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python generate_brief.py
+
+      - name: Commit 並 Push
+        run: |
+          git config user.email "bot@daily-brief"
+          git config user.name "Daily Brief Bot"
+          git add -A
+          git diff --cached --quiet || git commit -m "📅 $(date -u +'%Y-%m-%d') 每日簡報更新"
+          git push
