@@ -174,8 +174,6 @@ def build_brief_html(data, dt):
     .fact-title {{ font-size:14px; font-weight:700; color:#7a5c00; margin-bottom:8px; }}
     .fact-body {{ font-size:14px; line-height:1.75; color:#5a4200; }}
     .footer {{ text-align:center; margin-top:28px; font-size:12px; color:#bbb; letter-spacing:0.05em; }}
-    .dashboard-btn {{ position:fixed; bottom:24px; right:20px; background:#1b2d4f; color:#fff; text-decoration:none; padding:8px 16px; border-radius:20px; font-size:12px; font-weight:600; box-shadow:0 4px 16px rgba(27,45,79,0.3); opacity:0.85; transition:opacity .2s; z-index:999; white-space:nowrap; }}
-    .dashboard-btn:hover {{ opacity:1; }}
   </style>
 </head>
 <body>
@@ -206,7 +204,6 @@ def build_brief_html(data, dt):
       <a href="index.html" style="color:#bbb;text-decoration:none;">← 返回所有簡報</a> &nbsp;·&nbsp; 柚子 Daily Brief &nbsp;·&nbsp; {date_str}
     </div>
   </div>
-  <a href="{DASHBOARD_URL}" class="dashboard-btn" target="_blank">📊 投資儀表板</a>
 </body>
 </html>"""
 
@@ -364,8 +361,6 @@ def build_index_html(repo_dir):
     .month-panel-close {{ background:none; border:none; cursor:pointer; font-size:12px; color:#999; padding:4px 8px; border-radius:6px; }}
     .month-panel-close:hover {{ background:#f0ede8; }}
     /* Dashboard link */
-    .dashboard-btn {{ position:fixed; bottom:24px; right:20px; background:#1b2d4f; color:#fff; text-decoration:none; padding:8px 16px; border-radius:20px; font-size:12px; font-weight:600; box-shadow:0 4px 16px rgba(27,45,79,.3); opacity:.85; transition:opacity .2s; z-index:999; white-space:nowrap; }}
-    .dashboard-btn:hover {{ opacity:1; }}
     .empty-hint {{ color:#bbb; font-size:13px; padding:16px 8px; }}
     .footer {{ text-align:center; margin-top:24px; font-size:12px; color:#bbb; }}
   </style>
