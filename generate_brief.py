@@ -284,11 +284,13 @@ def build_index_html(repo_dir):
         })
 
     for g in month_groups:
-        badge = '<div class="month-card-ongoing">進行中</div>' if g["is_current"] else ""
-        cls   = " month-card--current" if g["is_current"] else ""
+        badge  = '<div class="month-card-ongoing">進行中</div>' if g["is_current"] else ""
+        cls    = " month-card--current" if g["is_current"] else ""
+        animal = MONTH_ANIMALS[g["month"]][0]  # 每月固定用週一的動物作為代表
         month_cards += (
             f'<div class="month-card{cls}" data-month="{g["key"]}" onclick="toggleMonth(\'{g["key"]}\')">'
             f'{badge}'
+            f'<div class="month-card-animal">{animal}</div>'
             f'<div class="month-card-year">{g["year"]}</div>'
             f'<div class="month-card-name">{MONTH_ZH[g["month"]]}</div>'
             f'<div class="month-card-count">{g["count"]}篇</div>'
@@ -350,6 +352,7 @@ def build_index_html(repo_dir):
     .month-card-ongoing {{ display:inline-flex; align-items:center; gap:4px; background:rgba(110,211,130,.18); border:1px solid rgba(110,211,130,.4); border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; color:#7de89a; margin-bottom:8px; }}
     .month-card-ongoing::before {{ content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; }}
     @keyframes pulse {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:.3; }} }}
+    .month-card-animal {{ font-size:22px; line-height:1; margin-bottom:6px; }}
     .month-card-year {{ font-size:11px; color:rgba(255,255,255,.5); }}
     .month-card-name {{ font-size:16px; font-weight:700; color:#fff; margin:2px 0; }}
     .month-card-count {{ font-size:11px; color:rgba(255,255,255,.5); }}
