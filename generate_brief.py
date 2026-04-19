@@ -25,6 +25,10 @@ MONTH_ANIMALS = {
     11: ["🦔","🐿️","🦡","🦦","🦥","🐻","🐹"],
     12: ["🦌","🐻‍❄️","🐧","🦭","🦊","🐺","🐹"],
 }
+MONTH_ICONS = {
+    1:"❄️", 2:"🧧", 3:"🌸", 4:"🌿", 5:"🌺", 6:"☀️",
+    7:"🌊", 8:"🌻", 9:"🥮", 10:"🍁", 11:"🍂", 12:"🎄"
+}
 WEEKDAY_ZH = ["一","二","三","四","五","六","日"]
 MONTH_ZH   = ["","一月","二月","三月","四月","五月","六月",
               "七月","八月","九月","十月","十一月","十二月"]
@@ -286,7 +290,7 @@ def build_index_html(repo_dir):
     for g in month_groups:
         badge  = '<div class="month-card-ongoing">進行中</div>' if g["is_current"] else ""
         cls    = " month-card--current" if g["is_current"] else ""
-        animal = MONTH_ANIMALS[g["month"]][0]  # 每月固定用週一的動物作為代表
+        animal = MONTH_ICONS[g["month"]]
         month_cards += (
             f'<div class="month-card{cls}" data-month="{g["key"]}" onclick="toggleMonth(\'{g["key"]}\')">'
             f'{badge}'
