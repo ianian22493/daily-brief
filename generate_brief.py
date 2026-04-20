@@ -86,32 +86,32 @@ def fetch_news(date_str, weekday_zh):
     except Exception as e:
         errors.append(f"gemini-2.0-flash: {e}")
 
-    # 嘗試 2：gemini-1.5-flash + Google Search grounding
+    # 嘗試 2：gemini-2.0-flash-lite + Google Search grounding（不同配額池）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-1.5-flash",
+                model="gemini-2.0-flash-lite",
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     tools=[types.Tool(google_search=types.GoogleSearch())]
                 )
             )
             text = resp.text
-            print("  ✓ gemini-1.5-flash + google_search")
+            print("  ✓ gemini-2.0-flash-lite + google_search")
         except Exception as e:
-            errors.append(f"gemini-1.5-flash grounded: {e}")
+            errors.append(f"gemini-2.0-flash-lite: {e}")
 
-    # 嘗試 3：gemini-1.5-flash 純生成（無搜尋，fallback）
+    # 嘗試 3：gemini-2.0-flash-lite 純生成（無搜尋，fallback）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-1.5-flash",
+                model="gemini-2.0-flash-lite",
                 contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
             )
             text = resp.text
-            print("  ⚠ gemini-1.5-flash fallback（無搜尋）")
+            print("  ⚠ gemini-2.0-flash-lite fallback（無搜尋）")
         except Exception as e:
-            errors.append(f"gemini-1.5-flash fallback: {e}")
+            errors.append(f"gemini-2.0-flash-lite fallback: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
