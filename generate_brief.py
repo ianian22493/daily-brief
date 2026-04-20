@@ -47,14 +47,6 @@ def fetch_news(date_str, weekday_zh):
     from google.genai import types
     client = genai.Client(api_key=api_key)
 
-    # 診斷：列出可用模型（找到正確名稱後可移除）
-    try:
-        models = client.models.list()
-        flash_models = [m.name for m in models if "flash" in m.name.lower()]
-        print(f"  📋 可用 flash 模型：{flash_models[:10]}")
-    except Exception as e:
-        print(f"  ⚠ 無法列出模型：{e}")
-
     prompt = f"""今天是 {date_str}（星期{weekday_zh}）。
 
 你是繁體中文新聞編輯，請搜尋今天（{date_str}）最新的國際新聞，撰寫每日簡報。
