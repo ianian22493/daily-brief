@@ -45,7 +45,11 @@ def fetch_news(date_str, weekday_zh):
 
     from google import genai
     from google.genai import types
-    client = genai.Client(api_key=api_key)
+    # gemini-2.5-flash 需要 v1alpha API 版本
+    client = genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(api_version="v1alpha")
+    )
 
     prompt = f"""今天是 {date_str}（星期{weekday_zh}）。
 
@@ -71,46 +75,47 @@ def fetch_news(date_str, weekday_zh):
     text = None
     errors = []
 
-    # 嘗試 1：gemini-2.0-flash-lite + Google Search grounding（AI Studio 免費 1500次/天）
+    # 嘗試 1：gemini-2.5-flash-preview + Google Search grounding（此帳號有免費額度）
     try:
         resp = client.models.generate_content(
-            model="gemini-2.0-flash-lite",
+            model="gemini-2.5-flash-preview-04-17",
             contents=prompt,
             config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())]
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                thinking_config=types.ThinkingConfig(thinking_budget=0)
             )
         )
         text = resp.text
-        print("  ✓ gemini-2.0-flash-lite + google_search")
+        print("  ✓ gemini-2.5-flash-preview + google_search")
     except Exception as e:
-        errors.append(f"gemini-2.0-flash-lite: {e}")
+        errors.append(f"gemini-2.5-flash-preview: {e}")
 
-    # 嘗試 2：gemini-2.0-flash + Google Search grounding
+    # 嘗試 2：gemini-2.5-flash-preview 無搜尋（fallback）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt,
+                model="gemini-2.5-flash-preview-04-17",
+                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）",
                 config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())]
+                    thinking_config=types.ThinkingConfig(thinking_budget=0)
                 )
             )
             text = resp.text
-            print("  ✓ gemini-2.0-flash + google_search")
+            print("  ⚠ gemini-2.5-flash-preview fallback（無搜尋）")
         except Exception as e:
-            errors.append(f"gemini-2.0-flash: {e}")
+            errors.append(f"gemini-2.5-flash-preview fallback: {e}")
 
-    # 嘗試 3：gemini-2.0-flash-lite 純生成（無搜尋，最後手段）
+    # 嘗試 3：gemini-2.5-flash-preview 最小設定（最後手段）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-2.0-flash-lite",
-                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
+                model="gemini-2.5-flash-preview-04-17",
+                contents=prompt + "\n\n（無法搜尋，以知識回答，標題末加「⚠️」）"
             )
             text = resp.text
-            print("  ⚠ gemini-2.0-flash-lite fallback（無搜尋）")
+            print("  ⚠ gemini-2.5-flash-preview minimal fallback")
         except Exception as e:
-            errors.append(f"gemini-2.0-flash-lite fallback: {e}")
+            errors.append(f"gemini-2.5-flash-preview minimal: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
