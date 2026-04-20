@@ -72,46 +72,42 @@ def fetch_news(date_str, weekday_zh):
     text = None
     errors = []
 
-    # 嘗試 1：gemini-2.0-flash + Google Search grounding
+    # 嘗試 1：gemini-1.5-flash-8b（免費額度最大，無 grounding）
     try:
         resp = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())]
-            )
+            model="gemini-1.5-flash-8b",
+            contents=prompt
         )
         text = resp.text
-        print("  ✓ gemini-2.0-flash + google_search")
+        print("  ✓ gemini-1.5-flash-8b")
     except Exception as e:
-        errors.append(f"gemini-2.0-flash: {e}")
+        errors.append(f"gemini-1.5-flash-8b: {e}")
 
-    # 嘗試 2：gemini-2.0-flash-lite + Google Search grounding（不同配額池）
+    # 嘗試 2：gemini-1.5-flash（稍大模型，fallback）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-2.0-flash-lite",
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())]
-                )
+                model="gemini-1.5-flash",
+                contents=prompt
             )
             text = resp.text
-            print("  ✓ gemini-2.0-flash-lite + google_search")
+            print("  ✓ gemini-1.5-flash")
         except Exception as e:
-            errors.append(f"gemini-2.0-flash-lite: {e}")
+            errors.append(f"gemini-1.5-flash: {e}")
 
-    # 嘗試 3：gemini-2.0-flash-lite 純生成（無搜尋，fallback）
+    # 嘗試 3：gemini-1.5-flash-8b 最小 prompt（最後手段）
     if text is None:
         try:
+            short_prompt = f"""今天是 {date_str}（星期{weekday_zh}）。請輸出近期5則國際新聞+1則冷知識，純 JSON 格式：
+{{"news":[{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}}],"fact":{{"title":"...","body":"..."}}}}"""
             resp = client.models.generate_content(
-                model="gemini-2.0-flash-lite",
-                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
+                model="gemini-1.5-flash-8b",
+                contents=short_prompt
             )
             text = resp.text
-            print("  ⚠ gemini-2.0-flash-lite fallback（無搜尋）")
+            print("  ⚠ gemini-1.5-flash-8b short fallback")
         except Exception as e:
-            errors.append(f"gemini-2.0-flash-lite fallback: {e}")
+            errors.append(f"gemini-1.5-flash-8b fallback: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
