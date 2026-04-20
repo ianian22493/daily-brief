@@ -76,47 +76,73 @@ def fetch_news(date_str, weekday_zh):
 請輸出純 JSON，不含任何 markdown 標記、說明文字或 code block：
 {{"news":[{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}}],"fact":{{"title":"...","body":"..."}}}}"""
 
+    import time
+
+    def try_generate(model, contents, config=None, label=""):
+        """帶重試的 generate_content，503 最多重試 3 次"""
+        for attempt in range(3):
+            try:
+                if config:
+                    resp = client.models.generate_content(
+                        model=model, contents=contents, config=config)
+                else:
+                    resp = client.models.generate_content(
+                        model=model, contents=contents)
+                return resp.text
+            except Exception as e:
+                msg = str(e)
+                if "503" in msg and attempt < 2:
+                    wait = 20 * (attempt + 1)
+                    print(f"  ⏳ {label} 503 繁忙，{wait}秒後重試（第{attempt+1}次）...")
+                    time.sleep(wait)
+                else:
+                    raise
+        return None
+
     text = None
     errors = []
 
-    # 嘗試 1：gemini-2.5-flash + Google Search grounding（此帳號有免費額度）
+    # 嘗試 1：gemini-2.5-flash + Google Search grounding
     try:
-        resp = client.models.generate_content(
+        text = try_generate(
             model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
                 thinking_config=types.ThinkingConfig(thinking_budget=0)
-            )
+            ),
+            label="gemini-2.5-flash+search"
         )
-        text = resp.text
-        print("  ✓ gemini-2.5-flash-preview + google_search")
+        print("  ✓ gemini-2.5-flash + google_search")
     except Exception as e:
-        errors.append(f"gemini-2.5-flash-preview: {e}")
+        errors.append(f"gemini-2.5-flash+search: {e}")
 
-    # 嘗試 2：gemini-2.5-flash 無搜尋（fallback）
+    # 嘗試 2：gemini-2.5-flash-lite（更輕量，較少擁塞）
     if text is None:
         try:
-            resp = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
+            text = try_generate(
+                model="gemini-2.5-flash-lite",
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    tools=[types.Tool(google_search=types.GoogleSearch())]
+                ),
+                label="gemini-2.5-flash-lite+search"
             )
-            text = resp.text
+            print("  ✓ gemini-2.5-flash-lite + google_search")
+        except Exception as e:
+            errors.append(f"gemini-2.5-flash-lite: {e}")
+
+    # 嘗試 3：gemini-2.5-flash 無搜尋（最後手段）
+    if text is None:
+        try:
+            text = try_generate(
+                model="gemini-2.5-flash",
+                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）",
+                label="gemini-2.5-flash-fallback"
+            )
             print("  ⚠ gemini-2.5-flash fallback（無搜尋）")
         except Exception as e:
             errors.append(f"gemini-2.5-flash fallback: {e}")
-
-    # 嘗試 3：gemini-2.5-flash-preview-05-20（最新 preview，最後手段）
-    if text is None:
-        try:
-            resp = client.models.generate_content(
-                model="gemini-2.5-flash-preview-05-20",
-                contents=prompt + "\n\n（無法搜尋，以知識回答，標題末加「⚠️」）"
-            )
-            text = resp.text
-            print("  ⚠ gemini-2.5-flash-preview-05-20 fallback")
-        except Exception as e:
-            errors.append(f"gemini-2.5-flash-preview-05-20: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
