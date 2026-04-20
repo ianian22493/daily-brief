@@ -33,6 +33,17 @@ WEEKDAY_ZH = ["一","二","三","四","五","六","日"]
 MONTH_ZH   = ["","一月","二月","三月","四月","五月","六月",
               "七月","八月","九月","十月","十一月","十二月"]
 
+# ── 特殊日期提醒（月, 日）──
+SPECIAL_DATES = {
+    (11,  7): {"label": "你的生日",   "today_msg": "生日快樂！🎉",       "emoji": "🎂"},
+    ( 4, 14): {"label": "老婆的生日", "today_msg": "記得好好慶祝 💑",    "emoji": "🎂"},
+    ( 1,  4): {"label": "結婚紀念日", "today_msg": "紀念日快樂 💍",       "emoji": "💍"},
+    ( 4, 26): {"label": "媽媽的生日", "today_msg": "記得打電話祝福 🌸",  "emoji": "🎂"},
+    ( 8,  8): {"label": "爸爸的生日", "today_msg": "記得打電話祝福 👨‍👧", "emoji": "🎂"},
+    ( 6, 16): {"label": "哥哥的生日", "today_msg": "記得傳訊息祝福 🎉",  "emoji": "🎂"},
+    (10, 17): {"label": "姐姐的生日", "today_msg": "記得傳訊息祝福 🎊",  "emoji": "🎂"},
+}
+
 
 # ════════════════════════════════════════════════════════════════════
 # Gemini — 搜尋並生成新聞內容
@@ -157,11 +168,43 @@ def fetch_news(date_str, weekday_zh):
 # ════════════════════════════════════════════════════════════════════
 DASHBOARD_URL = "https://ianian22493.github.io/investment-dashboard/"
 
+
+def get_special_day_banner(dt):
+    """回傳特殊日期 banner HTML；當天 = 彩色橫幅，前一天 = 黃色預告，其他 = 空字串"""
+    from datetime import timedelta
+    today_key = (dt.month, dt.day)
+    tom       = (dt + timedelta(days=1))
+    tom_key   = (tom.month, tom.day)
+
+    if today_key in SPECIAL_DATES:
+        info = SPECIAL_DATES[today_key]
+        return (
+            f'<div class="special-banner special-banner--today">'
+            f'<div class="banner-emoji">{info["emoji"]}</div>'
+            f'<div class="banner-text">'
+            f'<div class="banner-title">今天是{info["label"]}！</div>'
+            f'<div class="banner-sub">{info["today_msg"]}</div>'
+            f'</div></div>'
+        )
+    elif tom_key in SPECIAL_DATES:
+        info = SPECIAL_DATES[tom_key]
+        return (
+            f'<div class="special-banner special-banner--tomorrow">'
+            f'<div class="banner-emoji">🔔</div>'
+            f'<div class="banner-text">'
+            f'<div class="banner-title">明天是{info["label"]}（{tom.month}/{tom.day}）</div>'
+            f'<div class="banner-sub">記得提前準備喔～</div>'
+            f'</div></div>'
+        )
+    return ""
+
+
 def build_brief_html(data, dt):
-    date_str = dt.strftime("%Y-%m-%d")
-    date_zh  = f"{dt.year}年{dt.month}月{dt.day}日"
-    weekday  = WEEKDAY_ZH[dt.weekday()]
-    animal   = MONTH_ANIMALS[dt.month][dt.weekday()]
+    date_str       = dt.strftime("%Y-%m-%d")
+    date_zh        = f"{dt.year}年{dt.month}月{dt.day}日"
+    weekday        = WEEKDAY_ZH[dt.weekday()]
+    animal         = MONTH_ANIMALS[dt.month][dt.weekday()]
+    special_banner = get_special_day_banner(dt)
 
     news_html = ""
     for i, item in enumerate(data["news"][:5], 1):
@@ -213,10 +256,22 @@ def build_brief_html(data, dt):
     .fact-title {{ font-size:14px; font-weight:700; color:#7a5c00; margin-bottom:8px; }}
     .fact-body {{ font-size:14px; line-height:1.75; color:#5a4200; }}
     .footer {{ text-align:center; margin-top:28px; font-size:12px; color:#bbb; letter-spacing:0.05em; }}
+    /* 特殊日期 Banner */
+    .special-banner {{ display:flex; align-items:center; gap:16px; border-radius:14px; padding:18px 24px; margin-bottom:12px; }}
+    .special-banner--today {{ background:linear-gradient(135deg,#ff6b9d 0%,#ff8c42 100%); box-shadow:0 4px 20px rgba(255,107,157,0.35); }}
+    .special-banner--tomorrow {{ background:linear-gradient(135deg,#fffbea 0%,#fff0c0 100%); border:1.5px solid #ffd54f; }}
+    .banner-emoji {{ font-size:40px; line-height:1; flex-shrink:0; }}
+    .banner-title {{ font-size:17px; font-weight:800; line-height:1.3; }}
+    .banner-sub {{ font-size:13px; margin-top:4px; }}
+    .special-banner--today .banner-title {{ color:#fff; }}
+    .special-banner--today .banner-sub {{ color:rgba(255,255,255,0.85); }}
+    .special-banner--tomorrow .banner-title {{ color:#7a4e00; }}
+    .special-banner--tomorrow .banner-sub {{ color:#a06500; }}
   </style>
 </head>
 <body>
   <div class="container">
+    {special_banner}
     <div class="header">
       <div class="animal-badge">{animal}</div>
       <div class="header-text">
