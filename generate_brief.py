@@ -447,7 +447,8 @@ def main():
     index_html = build_index_html(".")
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(index_html)
-    print(f"  ✓ index.html 已重建（掃描 {len([ff for ff in os.listdir('.') if re.match(r'^\\d{{4}}-\\d{{2}}-\\d{{2}}\\.html$', ff)])} 份簡報）")
+    brief_count = len([ff for ff in os.listdir('.') if re.match(r'^\d{4}-\d{2}-\d{2}\.html$', ff)])
+    print(f"  ✓ index.html 已重建（掃描 {brief_count} 份簡報）")
 
     print(f"✅ 完成！今日動物：{MONTH_ANIMALS[dt.month][dt.weekday()]}")
 
