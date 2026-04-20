@@ -43,10 +43,8 @@ def fetch_news(date_str, weekday_zh):
     if not api_key:
         raise RuntimeError("未設定環境變數 GEMINI_API_KEY")
 
-    from google import genai
-    from google.genai import types
-
-    client = genai.Client(api_key=api_key)
+    import google.generativeai as genai
+    genai.configure(api_key=api_key)
 
     prompt = f"""今天是 {date_str}（星期{weekday_zh}）。
 
@@ -72,46 +70,42 @@ def fetch_news(date_str, weekday_zh):
     text = None
     errors = []
 
-    # 嘗試 1：gemini-2.5-flash-preview + Google Search grounding（最新，有免費額度）
+    # 嘗試 1：gemini-1.5-flash + Google Search grounding（v1 API，有免費額度）
     try:
-        resp = client.models.generate_content(
-            model="gemini-2.5-flash-preview-04-17",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())]
-            )
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            tools="google_search_retrieval"
         )
+        resp = model.generate_content(prompt)
         text = resp.text
-        print("  ✓ gemini-2.5-flash-preview + google_search")
+        print("  ✓ gemini-1.5-flash + google_search_retrieval")
     except Exception as e:
-        errors.append(f"gemini-2.5-flash-preview: {e}")
+        errors.append(f"gemini-1.5-flash: {e}")
 
-    # 嘗試 2：gemini-2.0-flash + Google Search grounding
+    # 嘗試 2：gemini-1.5-flash-8b + Google Search grounding（配額更多）
     if text is None:
         try:
-            resp = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())]
-                )
+            model = genai.GenerativeModel(
+                model_name="gemini-1.5-flash-8b",
+                tools="google_search_retrieval"
             )
+            resp = model.generate_content(prompt)
             text = resp.text
-            print("  ✓ gemini-2.0-flash + google_search")
+            print("  ✓ gemini-1.5-flash-8b + google_search_retrieval")
         except Exception as e:
-            errors.append(f"gemini-2.0-flash: {e}")
+            errors.append(f"gemini-1.5-flash-8b: {e}")
 
-    # 嘗試 3：gemini-2.5-flash-preview 純生成（無搜尋，最後手段）
+    # 嘗試 3：gemini-1.5-flash 純生成（無搜尋，最後手段）
     if text is None:
         try:
-            resp = client.models.generate_content(
-                model="gemini-2.5-flash-preview-04-17",
-                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
+            model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+            resp = model.generate_content(
+                prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
             )
             text = resp.text
-            print("  ⚠ gemini-2.5-flash-preview fallback（無搜尋）")
+            print("  ⚠ gemini-1.5-flash fallback（無搜尋）")
         except Exception as e:
-            errors.append(f"gemini-2.5-flash-preview fallback: {e}")
+            errors.append(f"gemini-1.5-flash fallback: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
