@@ -23,7 +23,7 @@ jobs:
           python-version: '3.11'
 
       - name: 安裝依賴
-        run: pip install google-generativeai
+        run: pip install google-genai
 
       - name: 生成今日簡報
         env:
