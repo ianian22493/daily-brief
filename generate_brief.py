@@ -45,11 +45,15 @@ def fetch_news(date_str, weekday_zh):
 
     from google import genai
     from google.genai import types
-    # gemini-2.5-flash 需要 v1alpha API 版本
-    client = genai.Client(
-        api_key=api_key,
-        http_options=types.HttpOptions(api_version="v1alpha")
-    )
+    client = genai.Client(api_key=api_key)
+
+    # 診斷：列出可用模型（找到正確名稱後可移除）
+    try:
+        models = client.models.list()
+        flash_models = [m.name for m in models if "flash" in m.name.lower()]
+        print(f"  📋 可用 flash 模型：{flash_models[:10]}")
+    except Exception as e:
+        print(f"  ⚠ 無法列出模型：{e}")
 
     prompt = f"""今天是 {date_str}（星期{weekday_zh}）。
 
@@ -75,10 +79,10 @@ def fetch_news(date_str, weekday_zh):
     text = None
     errors = []
 
-    # 嘗試 1：gemini-2.5-flash-preview + Google Search grounding（此帳號有免費額度）
+    # 嘗試 1：gemini-2.5-flash + Google Search grounding（此帳號有免費額度）
     try:
         resp = client.models.generate_content(
-            model="gemini-2.5-flash-preview-04-17",
+            model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
@@ -90,32 +94,29 @@ def fetch_news(date_str, weekday_zh):
     except Exception as e:
         errors.append(f"gemini-2.5-flash-preview: {e}")
 
-    # 嘗試 2：gemini-2.5-flash-preview 無搜尋（fallback）
+    # 嘗試 2：gemini-2.5-flash 無搜尋（fallback）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-2.5-flash-preview-04-17",
-                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）",
-                config=types.GenerateContentConfig(
-                    thinking_config=types.ThinkingConfig(thinking_budget=0)
-                )
+                model="gemini-2.5-flash",
+                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）"
             )
             text = resp.text
-            print("  ⚠ gemini-2.5-flash-preview fallback（無搜尋）")
+            print("  ⚠ gemini-2.5-flash fallback（無搜尋）")
         except Exception as e:
-            errors.append(f"gemini-2.5-flash-preview fallback: {e}")
+            errors.append(f"gemini-2.5-flash fallback: {e}")
 
-    # 嘗試 3：gemini-2.5-flash-preview 最小設定（最後手段）
+    # 嘗試 3：gemini-2.5-flash-preview-05-20（最新 preview，最後手段）
     if text is None:
         try:
             resp = client.models.generate_content(
-                model="gemini-2.5-flash-preview-04-17",
+                model="gemini-2.5-flash-preview-05-20",
                 contents=prompt + "\n\n（無法搜尋，以知識回答，標題末加「⚠️」）"
             )
             text = resp.text
-            print("  ⚠ gemini-2.5-flash-preview minimal fallback")
+            print("  ⚠ gemini-2.5-flash-preview-05-20 fallback")
         except Exception as e:
-            errors.append(f"gemini-2.5-flash-preview minimal: {e}")
+            errors.append(f"gemini-2.5-flash-preview-05-20: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
