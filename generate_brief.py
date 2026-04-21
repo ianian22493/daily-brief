@@ -155,12 +155,34 @@ def fetch_news(date_str, weekday_zh):
     text = re.sub(r"^```\s*",     "", text,          flags=re.MULTILINE)
     text = text.strip()
 
+    # 移除 Google Search 引用標記（[1], [2] 等），這些會破壞 JSON
+    text = re.sub(r"\[\d+\]", "", text)
+
     # 取第一個 JSON 物件（防止 grounding metadata 混入）
     m = re.search(r"\{.*\}", text, re.DOTALL)
     if m:
         text = m.group()
 
-    return json.loads(text)
+    # 嘗試解析；若仍失敗，以無搜尋模式重新呼叫一次
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        print(f"  ⚠ JSON 解析失敗（{e}），改用無搜尋模式重試...")
+        retry_text = try_generate(
+            model="gemini-2.5-flash",
+            contents=prompt + "\n\n重要：只輸出純 JSON，不含任何引用標記、括號數字或額外說明。",
+            label="gemini-2.5-flash-json-retry"
+        )
+        if retry_text is None:
+            raise
+        retry_text = re.sub(r"^```json\s*", "", retry_text.strip(), flags=re.MULTILINE)
+        retry_text = re.sub(r"^```\s*",     "", retry_text,          flags=re.MULTILINE)
+        retry_text = re.sub(r"\[\d+\]",     "", retry_text)
+        retry_text = retry_text.strip()
+        m2 = re.search(r"\{.*\}", retry_text, re.DOTALL)
+        if m2:
+            retry_text = m2.group()
+        return json.loads(retry_text)
 
 
 # ════════════════════════════════════════════════════════════════════
