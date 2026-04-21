@@ -1,10 +1,13 @@
 name: 每日新聞簡報
 
 on:
-  # 每天 01:00 UTC = 台灣時間 09:00
+  # 台灣時間 09:00 / 12:00 / 15:00 各觸發一次
+  # GitHub 排程不保證準時，三次觸發確保當天必有一次成功
   schedule:
-    - cron: '0 1 * * *'
-  # 手動觸發（測試用）
+    - cron: '0 1 * * *'   # 09:00 台灣
+    - cron: '0 4 * * *'   # 12:00 台灣
+    - cron: '0 7 * * *'   # 15:00 台灣
+  # 手動觸發（補跑用）
   workflow_dispatch:
 
 permissions:
@@ -17,20 +20,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: 確認今日是否已有簡報
+        id: check
+        run: |
+          TODAY=$(TZ='Asia/Taipei' date +'%Y-%m-%d')
+          echo "today=$TODAY" >> $GITHUB_OUTPUT
+          if [ -f "${TODAY}.html" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "✅ 今日簡報 ${TODAY}.html 已存在，略過生成"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "📰 今日簡報 ${TODAY}.html 尚未生成，開始執行"
+          fi
+
       - name: Set up Python
+        if: steps.check.outputs.skip == 'false'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: 安裝依賴
+        if: steps.check.outputs.skip == 'false'
         run: pip install google-genai
 
       - name: 生成今日簡報
+        if: steps.check.outputs.skip == 'false'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python generate_brief.py
 
       - name: Commit 並 Push
+        if: steps.check.outputs.skip == 'false'
         run: |
           git config user.email "bot@daily-brief"
           git config user.name "Daily Brief Bot"
