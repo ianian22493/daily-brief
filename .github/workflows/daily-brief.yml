@@ -18,6 +18,14 @@ on:
         options:
           - 'false'
           - 'true'
+      backfill:
+        description: '補跑舊設計（把所有舊文章套上新版外觀，不呼叫 Gemini）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 permissions:
   contents: write
@@ -29,22 +37,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 確認今日是否已有簡報
+      - name: 確認執行模式
         id: check
         run: |
           TODAY=$(TZ='Asia/Taipei' date +'%Y-%m-%d')
           echo "today=$TODAY" >> $GITHUB_OUTPUT
           FORCE="${{ github.event.inputs.force }}"
-          if [ -f "${TODAY}.html" ] && [ "$FORCE" != "true" ]; then
+          BACKFILL="${{ github.event.inputs.backfill }}"
+          if [ "$BACKFILL" = "true" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "mode=backfill" >> $GITHUB_OUTPUT
+            echo "🔄 Backfill 模式：重新套用新設計到所有舊文章"
+          elif [ -f "${TODAY}.html" ] && [ "$FORCE" != "true" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "✅ 今日簡報 ${TODAY}.html 已存在，略過生成（手動強制重跑請選 force=true）"
+            echo "mode=skip" >> $GITHUB_OUTPUT
+            echo "✅ 今日簡報 ${TODAY}.html 已存在，略過（手動強制請選 force=true）"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
-            if [ "$FORCE" = "true" ]; then
-              echo "🔄 強制重跑模式，覆蓋今日簡報"
-            else
-              echo "📰 今日簡報 ${TODAY}.html 尚未生成，開始執行"
-            fi
+            echo "mode=generate" >> $GITHUB_OUTPUT
+            echo "📰 生成模式：呼叫 Gemini 產生今日簡報"
           fi
 
       - name: Set up Python
@@ -57,10 +68,11 @@ jobs:
         if: steps.check.outputs.skip == 'false'
         run: pip install google-genai
 
-      - name: 生成今日簡報
+      - name: 執行腳本
         if: steps.check.outputs.skip == 'false'
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BACKFILL: ${{ github.event.inputs.backfill }}
         run: python generate_brief.py
 
       - name: Commit 並 Push

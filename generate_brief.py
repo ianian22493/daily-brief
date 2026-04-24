@@ -947,9 +947,70 @@ def build_index_html(repo_dir):
 
 
 # ════════════════════════════════════════════════════════════════════
+# Backfill：把所有舊版 HTML 套上新設計（一次性補跑）
+# ════════════════════════════════════════════════════════════════════
+def backfill_all(repo_dir="."):
+    """解析所有現有 YYYY-MM-DD.html 的內容，用新版模板重新輸出"""
+    files = sorted(
+        [f for f in os.listdir(repo_dir) if re.match(r"^\d{4}-\d{2}-\d{2}\.html$", f)]
+    )
+    print(f"🔄 Backfill 開始，共 {len(files)} 個檔案")
+    ok = skip = 0
+
+    for filename in files:
+        filepath = os.path.join(repo_dir, filename)
+        date_str = filename[:10]
+        try:
+            dt = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=TZ_TW)
+            with open(filepath, encoding="utf-8") as f:
+                content = f.read()
+
+            # 嘗試解析新版（ni-title / ni-text）或舊版（news-title / news-body）
+            titles = re.findall(r'class="ni-title">(.*?)</div>', content, re.DOTALL)
+            bodies = re.findall(r'class="ni-text">(.*?)</div>', content, re.DOTALL)
+            if not titles:
+                titles = re.findall(r'class="news-title">(.*?)</div>', content, re.DOTALL)
+                bodies = re.findall(r'class="news-body">(.*?)</div>', content, re.DOTALL)
+
+            fact_titles = re.findall(r'class="fact-title">(.*?)</div>', content, re.DOTALL)
+            fact_bodies = re.findall(r'class="fact-body">(.*?)</div>', content, re.DOTALL)
+
+            if len(titles) < 3 or not fact_titles:
+                print(f"  ⚠ {filename} 內容不足，略過")
+                skip += 1
+                continue
+
+            news = [{"title": t.strip(), "body": b.strip()}
+                    for t, b in zip(titles[:5], bodies[:5])]
+            data = {"news": news, "fact": {"title": fact_titles[0].strip(),
+                                           "body": fact_bodies[0].strip() if fact_bodies else ""}}
+
+            new_html = build_brief_html(data, dt)
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(new_html)
+            print(f"  ✓ {filename}")
+            ok += 1
+
+        except Exception as e:
+            print(f"  ✗ {filename} 失敗：{e}")
+            skip += 1
+
+    print(f"✅ Backfill 完成：{ok} 個更新，{skip} 個略過")
+
+
+# ════════════════════════════════════════════════════════════════════
 # 主程式
 # ════════════════════════════════════════════════════════════════════
 def main():
+    # 若設定 BACKFILL=true，只補跑舊文章設計，不呼叫 Gemini
+    if os.environ.get("BACKFILL") == "true":
+        backfill_all(".")
+        index_html = build_index_html(".")
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(index_html)
+        print("  ✓ index.html 已重建")
+        return
+
     now      = datetime.now(TZ_TW)
     dt       = now.date()
     date_str = dt.strftime("%Y-%m-%d")
