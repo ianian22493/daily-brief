@@ -7,8 +7,17 @@ on:
     - cron: '0 0 * * *'   # 08:00 台灣（主要）
     - cron: '0 1 * * *'   # 09:00 台灣（備用一）
     - cron: '30 1 * * *'  # 09:30 台灣（備用二）
-  # 手動觸發（補跑用）
+  # 手動觸發（補跑 / 強制重跑用）
   workflow_dispatch:
+    inputs:
+      force:
+        description: '強制重跑（覆蓋今日已有的簡報）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
 
 permissions:
   contents: write
@@ -18,24 +27,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: 確認今日是否已有簡報
         id: check
         run: |
           TODAY=$(TZ='Asia/Taipei' date +'%Y-%m-%d')
           echo "today=$TODAY" >> $GITHUB_OUTPUT
-          if [ -f "${TODAY}.html" ]; then
+          FORCE="${{ github.event.inputs.force }}"
+          if [ -f "${TODAY}.html" ] && [ "$FORCE" != "true" ]; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "✅ 今日簡報 ${TODAY}.html 已存在，略過生成"
+            echo "✅ 今日簡報 ${TODAY}.html 已存在，略過生成（手動強制重跑請選 force=true）"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
-            echo "📰 今日簡報 ${TODAY}.html 尚未生成，開始執行"
+            if [ "$FORCE" = "true" ]; then
+              echo "🔄 強制重跑模式，覆蓋今日簡報"
+            else
+              echo "📰 今日簡報 ${TODAY}.html 尚未生成，開始執行"
+            fi
           fi
 
       - name: Set up Python
         if: steps.check.outputs.skip == 'false'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
