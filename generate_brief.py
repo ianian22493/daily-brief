@@ -52,11 +52,6 @@ STATE_FILE = "brief_state.json"
 
 
 def load_used_facts():
-    """
-    從 brief_state.json 讀取所有歷史冷知識標題。
-    格式：{"facts": [{"date": "2026-04-16", "title": "..."}, ...]}
-    若檔案不存在，回傳空 dict（首次執行時會自動建立）。
-    """
     try:
         with open(STATE_FILE, encoding="utf-8") as f:
             return json.load(f)
@@ -65,18 +60,14 @@ def load_used_facts():
 
 
 def save_used_fact(state, date_str, fact_title):
-    """將今日冷知識標題寫入 brief_state.json，永久保存"""
-    # 避免同一天重複寫入
     state["facts"] = [e for e in state["facts"] if e.get("date") != date_str]
     state["facts"].append({"date": date_str, "title": fact_title})
-    # 依日期排序，方便閱讀
     state["facts"].sort(key=lambda e: e["date"])
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
 
 
 def fetch_news(date_str, weekday_zh, used_facts_state):
-    """呼叫 Gemini（含 Google Search grounding）生成當日新聞 JSON"""
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("未設定環境變數 GEMINI_API_KEY")
@@ -85,7 +76,6 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     from google.genai import types
     client = genai.Client(api_key=api_key)
 
-    # 從永久狀態檔取得所有歷史冷知識標題，告知 Gemini 全部避開
     all_titles = [e["title"] for e in used_facts_state.get("facts", [])]
     if all_titles:
         avoid_block = (
@@ -120,15 +110,12 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     import time
 
     def try_generate(model, contents, config=None, label=""):
-        """帶重試的 generate_content，503 最多重試 3 次"""
         for attempt in range(3):
             try:
                 if config:
-                    resp = client.models.generate_content(
-                        model=model, contents=contents, config=config)
+                    resp = client.models.generate_content(model=model, contents=contents, config=config)
                 else:
-                    resp = client.models.generate_content(
-                        model=model, contents=contents)
+                    resp = client.models.generate_content(model=model, contents=contents)
                 return resp.text
             except Exception as e:
                 msg = str(e)
@@ -143,7 +130,6 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     text = None
     errors = []
 
-    # 嘗試 1：gemini-2.5-flash + Google Search grounding
     try:
         text = try_generate(
             model="gemini-2.5-flash",
@@ -158,7 +144,6 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     except Exception as e:
         errors.append(f"gemini-2.5-flash+search: {e}")
 
-    # 嘗試 2：gemini-2.5-flash-lite（更輕量，較少擁塞）
     if text is None:
         try:
             text = try_generate(
@@ -173,7 +158,6 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
         except Exception as e:
             errors.append(f"gemini-2.5-flash-lite: {e}")
 
-    # 嘗試 3：gemini-2.5-flash 無搜尋（最後手段）
     if text is None:
         try:
             text = try_generate(
@@ -188,20 +172,15 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
 
-    # 清除 markdown code block 包裝
     text = re.sub(r"^```json\s*", "", text.strip(), flags=re.MULTILINE)
     text = re.sub(r"^```\s*",     "", text,          flags=re.MULTILINE)
     text = text.strip()
-
-    # 移除 Google Search 引用標記（[1], [2] 等），這些會破壞 JSON
     text = re.sub(r"\[\d+\]", "", text)
 
-    # 取第一個 JSON 物件（防止 grounding metadata 混入）
     m = re.search(r"\{.*\}", text, re.DOTALL)
     if m:
         text = m.group()
 
-    # 嘗試解析；若仍失敗，以無搜尋模式重新呼叫一次
     try:
         return json.loads(text)
     except json.JSONDecodeError as e:
@@ -224,13 +203,46 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 
 
 # ════════════════════════════════════════════════════════════════════
-# HTML 生成：單日 brief 頁面
+# HTML 生成：單日 brief 頁面（Yuzu Brief 設計）
 # ════════════════════════════════════════════════════════════════════
 DASHBOARD_URL = "https://ianian22493.github.io/investment-dashboard/"
 
+# Yuzu SVG logo（Y 融入柚子切片）
+YUZU_LOGO_LG = """<svg width="36" height="36" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lg1" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg1)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+</svg>"""
+
+YUZU_LOGO_SM = """<svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+  <defs>
+    <radialGradient id="lg2" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg2)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8"  fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"   stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+</svg>"""
+
 
 def get_special_day_banner(dt):
-    """回傳特殊日期 banner HTML；當天 = 彩色橫幅，前一天 = 黃色預告，其他 = 空字串"""
     from datetime import timedelta
     today_key = (dt.month, dt.day)
     tom       = (dt + timedelta(days=1))
@@ -259,23 +271,31 @@ def get_special_day_banner(dt):
     return ""
 
 
+# 每則新聞的 accent 色
+NEWS_ACCENT_COLORS = ["#1b2d4f", "#2563eb", "#0891b2", "#7c3aed", "#b45309"]
+
+
 def build_brief_html(data, dt):
     date_str       = dt.strftime("%Y-%m-%d")
     date_zh        = f"{dt.year}年{dt.month}月{dt.day}日"
+    year_zh        = f"{dt.year}年"
+    md_zh          = f"{dt.month}月{dt.day}日"
     weekday        = WEEKDAY_ZH[dt.weekday()]
     animal         = MONTH_ANIMALS[dt.month][dt.weekday()]
     special_banner = get_special_day_banner(dt)
 
+    # 新聞 HTML
     news_html = ""
     for i, item in enumerate(data["news"][:5], 1):
+        ac = NEWS_ACCENT_COLORS[i - 1]
         news_html += f"""
-        <div class="news-item">
-          <div class="news-number">{i}</div>
-          <div class="news-content">
-            <div class="news-title">{item['title']}</div>
-            <div class="news-body">{item['body']}</div>
-          </div>
-        </div>"""
+      <div class="ni" style="--ac:{ac}">
+        <div class="ni-n"><div class="ni-num">{i}</div></div>
+        <div class="ni-body">
+          <div class="ni-title">{item['title']}</div>
+          <div class="ni-text">{item['body']}</div>
+        </div>
+      </div>"""
 
     fact = data["fact"]
 
@@ -284,80 +304,265 @@ def build_brief_html(data, dt):
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>每日簡報｜{date_zh}</title>
+  <title>Yuzu Brief — {date_zh}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-    body {{ background: #f0ede8; font-family: -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color: #1a1a1a; min-height: 100vh; padding: 32px 16px 64px; }}
-    .container {{ max-width: 680px; margin: 0 auto; }}
-    .header {{ background: #1b2d4f; border-radius: 16px 16px 0 0; padding: 34px 40px 28px; position: relative; overflow: hidden; }}
-    .header::before {{ content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }}
-    .animal-badge {{ position:absolute; top:22px; right:26px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }}
-    .header-text {{ padding-right: 100px; }}
-    .date-main {{ font-size:28px; font-weight:700; color:#fff; line-height:1.2; letter-spacing:-0.01em; white-space:nowrap; }}
-    .weekday-row {{ margin-top:10px; }}
-    .weekday-badge {{ display:inline-block; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:3px 13px; font-size:13px; font-weight:600; color:rgba(255,255,255,0.72); letter-spacing:0.05em; }}
-    .header-divider {{ height:1px; background:rgba(255,255,255,0.1); margin:16px 0 12px; }}
-    .header-tagline {{ font-size:13px; color:rgba(255,255,255,0.36); letter-spacing:0.04em; }}
-    .body-card {{ background:#fff; border-radius:0 0 16px 16px; padding:36px 40px 40px; box-shadow:0 8px 40px rgba(0,0,0,0.08); }}
-    .section {{ margin-bottom:40px; }}
-    .section:last-child {{ margin-bottom:0; }}
-    .section-header {{ display:flex; align-items:center; gap:10px; margin-bottom:22px; padding-bottom:14px; border-bottom:1.5px solid #f0ede8; }}
-    .section-icon {{ font-size:18px; line-height:1; }}
-    .section-title {{ font-size:13px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#888; }}
-    .news-item {{ display:flex; gap:18px; padding:18px 0; border-bottom:1px solid #f5f3f0; }}
-    .news-item:last-child {{ border-bottom:none; padding-bottom:0; }}
-    .news-item:first-child {{ padding-top:0; }}
-    .news-number {{ flex-shrink:0; width:28px; height:28px; background:#1b2d4f; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; margin-top:2px; }}
-    .news-content {{ flex:1; }}
-    .news-title {{ font-size:15px; font-weight:700; line-height:1.4; color:#111; margin-bottom:7px; }}
-    .news-body {{ font-size:14px; line-height:1.75; color:#444; }}
-    .fact-card {{ background:linear-gradient(135deg,#fffbf0 0%,#fff8e1 100%); border:1.5px solid #ffe082; border-radius:12px; padding:22px 24px; position:relative; overflow:hidden; }}
-    .fact-card::before {{ content:'💡'; position:absolute; right:20px; top:16px; font-size:28px; opacity:0.3; }}
-    .fact-title {{ font-size:14px; font-weight:700; color:#7a5c00; margin-bottom:8px; }}
-    .fact-body {{ font-size:14px; line-height:1.75; color:#5a4200; }}
-    .footer {{ text-align:center; margin-top:28px; font-size:12px; color:#bbb; letter-spacing:0.05em; }}
-    /* 特殊日期 Banner */
-    .special-banner {{ display:flex; align-items:center; gap:16px; border-radius:14px; padding:18px 24px; margin-bottom:12px; }}
+    *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
+    :root {{
+      --bg:    #f3efe7;
+      --bg2:   #ebe6db;
+      --navy:  #1b2d4f;
+      --navy2: #0f1d34;
+      --ink:   #0f172a;
+      --ink2:  #374151;
+      --ink3:  #9ca3af;
+      --border:#ddd7c8;
+      --gold:  #b8922e;
+      --gold-l:#e8c84a;
+      --gold-bg:#fdf8ec;
+      --gold-b:#e8cf85;
+    }}
+    body {{ background:var(--bg); color:var(--ink); font-family:'DM Sans','Noto Sans TC',sans-serif; min-height:100vh; }}
+
+    /* Reading bar */
+    #rbar {{ position:fixed; top:0; left:0; z-index:400; height:3px; width:0%; background:linear-gradient(90deg,var(--navy) 0%,#4d9cf8 100%); transition:width .08s linear; }}
+
+    /* Top nav */
+    .topnav {{ position:sticky; top:0; z-index:300; height:52px; padding:0 28px; background:rgba(243,239,231,.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }}
+    .tn-brand {{ display:flex; align-items:center; gap:11px; text-decoration:none; }}
+    .tn-name {{ font-size:14px; font-weight:700; color:var(--ink); }}
+    .tn-sub {{ font-size:9px; color:var(--ink3); letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }}
+    .tn-links {{ display:flex; gap:22px; }}
+    .tn-link {{ font-size:12px; color:var(--ink3); text-decoration:none; letter-spacing:.04em; transition:color .15s; }}
+    .tn-link:hover, .tn-link.cur {{ color:var(--ink); }}
+
+    /* Hero */
+    .hero {{ background:var(--navy2); position:relative; overflow:hidden; }}
+    .hero-bg {{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }}
+    .hero-bg svg {{ position:absolute; inset:0; width:100%; height:100%; opacity:.06; }}
+    .hero-inner {{ max-width:800px; margin:0 auto; padding:52px 32px 0; position:relative; z-index:1; }}
+    .hero-layout {{ display:grid; grid-template-columns:1fr auto; gap:24px; align-items:flex-start; }}
+    .hero-eyebrow {{ font-size:10px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:18px; display:flex; align-items:center; gap:12px; }}
+    .hero-eyebrow::before {{ content:''; width:18px; height:1px; background:rgba(255,255,255,.2); display:inline-block; }}
+    .hero-date {{ font-family:'Playfair Display','Noto Serif TC',serif; font-weight:900; color:#fff; line-height:1.0; }}
+    .hero-date .yr {{ display:block; font-size:clamp(14px,2vw,18px); font-weight:400; font-style:italic; color:rgba(255,255,255,.38); margin-bottom:4px; }}
+    .hero-date .md {{ display:block; font-size:clamp(32px,6vw,56px); letter-spacing:-.03em; }}
+    .hero-weekday {{ margin-top:20px; display:inline-flex; align-items:center; gap:10px; }}
+    .hero-badge {{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:5px 18px; font-size:12px; color:rgba(255,255,255,.6); font-weight:500; }}
+    .hero-slogan {{ font-size:12px; color:rgba(255,255,255,.55); letter-spacing:.05em; }}
+    .hero-animal {{ width:110px; height:110px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:62px; line-height:1; flex-shrink:0; margin-top:4px; }}
+    @media(max-width:420px){{ .hero-animal {{ display:none; }} }}
+    .hero-rule {{ margin-top:36px; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5) 0%,rgba(201,168,76,.0) 60%); }}
+    .hero-sections {{ display:flex; gap:0; padding:13px 0; }}
+    .hs-item {{ font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); padding-right:22px; margin-right:22px; border-right:1px solid rgba(255,255,255,.15); display:flex; align-items:center; gap:6px; }}
+    .hs-item:last-child {{ border-right:none; }}
+    .hs-item.hi {{ color:rgba(255,255,255,.9); }}
+
+    /* Body */
+    .body-wrap {{ max-width:800px; margin:0 auto; padding:0 32px 80px; }}
+    .a-sec {{ padding:52px 0; border-bottom:1px solid var(--border); }}
+    .a-sec:last-child {{ border-bottom:none; }}
+    .sec-head {{ display:flex; align-items:center; gap:14px; margin-bottom:40px; }}
+    .sec-icon {{ font-size:20px; }}
+    .sec-label {{ font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#374151; white-space:nowrap; }}
+    .sec-rule {{ flex:1; height:1px; background:var(--border); }}
+
+    /* News */
+    .news-list {{ display:flex; flex-direction:column; gap:0; }}
+    .ni {{ --ac:#1b2d4f; display:grid; grid-template-columns:56px 1fr; padding:36px 0; border-bottom:1px solid var(--border); transition:opacity .5s ease, transform .5s ease; }}
+    .ni:first-child {{ padding-top:0; }}
+    .ni:last-child {{ border-bottom:none; padding-bottom:0; }}
+    .ni:hover .ni-title {{ color:var(--ac); }}
+    .ni:hover .ni-num {{ opacity:.45; }}
+    .ni-num {{ font-family:'Playfair Display',serif; font-size:48px; font-weight:900; line-height:1; color:var(--ac); opacity:.18; letter-spacing:-.03em; transition:opacity .2s; padding-top:2px; }}
+    .ni-title {{ font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(17px,2.5vw,20px); font-weight:700; line-height:1.4; color:var(--ink); margin-bottom:13px; text-wrap:pretty; transition:color .2s ease; }}
+    .ni-text {{ font-size:14px; line-height:1.95; color:var(--ink2); text-wrap:pretty; }}
+    .ni-lead {{ display:block; padding-left:14px; border-left:2.5px solid var(--ac); font-size:14px; font-weight:500; line-height:1.8; color:var(--ink2); margin-bottom:12px; }}
+
+    /* Fact */
+    .fact-wrap {{ background:var(--navy); border-radius:20px; overflow:hidden; position:relative; }}
+    .fact-wrap::before {{ content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 65%); pointer-events:none; }}
+    .fact-inner {{ display:grid; grid-template-columns:6px 1fr; }}
+    .fact-stripe {{ background:linear-gradient(180deg,var(--gold-l),rgba(184,146,46,.2)); }}
+    .fact-content {{ padding:34px 36px; }}
+    .fact-kicker {{ font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-l); margin-bottom:14px; display:flex; align-items:center; gap:8px; }}
+    .fact-kicker::before {{ content:''; display:inline-block; width:18px; height:1px; background:var(--gold); }}
+    .fact-title {{ font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(22px,3vw,28px); font-weight:700; color:#fff; margin-bottom:18px; line-height:1.3; }}
+    .fact-body {{ font-size:15px; line-height:2; color:rgba(255,255,255,.78); }}
+    .fact-animal {{ position:absolute; right:28px; bottom:24px; font-size:48px; opacity:.1; line-height:1; }}
+
+    /* Special banner */
+    .special-banner {{ display:flex; align-items:center; gap:16px; border-radius:14px; padding:18px 24px; margin-bottom:0; }}
     .special-banner--today {{ background:linear-gradient(135deg,#ff6b9d 0%,#ff8c42 100%); box-shadow:0 4px 20px rgba(255,107,157,0.35); }}
     .special-banner--tomorrow {{ background:linear-gradient(135deg,#fffbea 0%,#fff0c0 100%); border:1.5px solid #ffd54f; }}
     .banner-emoji {{ font-size:40px; line-height:1; flex-shrink:0; }}
     .banner-title {{ font-size:17px; font-weight:800; line-height:1.3; }}
     .banner-sub {{ font-size:13px; margin-top:4px; }}
     .special-banner--today .banner-title {{ color:#fff; }}
-    .special-banner--today .banner-sub {{ color:rgba(255,255,255,0.85); }}
+    .special-banner--today .banner-sub {{ color:rgba(255,255,255,.85); }}
     .special-banner--tomorrow .banner-title {{ color:#7a4e00; }}
     .special-banner--tomorrow .banner-sub {{ color:#a06500; }}
+
+    /* Footer */
+    .site-footer {{ max-width:800px; margin:0 auto; padding:24px 32px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }}
+    .sf-brand {{ display:flex; align-items:center; gap:10px; }}
+    .sf-name {{ font-size:12px; font-weight:600; color:var(--ink3); }}
+    .sf-date {{ font-size:11px; color:var(--ink3); margin-top:1px; }}
+    .sf-links {{ display:flex; gap:20px; }}
+    .sf-links a {{ font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }}
+    .sf-links a:hover {{ color:var(--ink); }}
+
+    /* Animations */
+    .js-animate .reveal {{ opacity:0; transform:translateY(16px); }}
+    .js-animate .ni {{ opacity:0; transform:translateY(16px); }}
+    .js-animate .fact-wrap {{ opacity:0; transform:translateY(16px); }}
+    .reveal, .ni, .fact-wrap {{ transition:opacity .5s ease, transform .5s ease; }}
+    .reveal.in, .ni.in, .fact-wrap.in {{ opacity:1 !important; transform:translateY(0) !important; }}
   </style>
 </head>
 <body>
-  <div class="container">
-    {special_banner}
-    <div class="header">
-      <div class="animal-badge">{animal}</div>
-      <div class="header-text">
-        <div class="date-main">{date_zh}</div>
-        <div class="weekday-row"><span class="weekday-badge">星期{weekday}</span></div>
-        <div class="header-divider"></div>
-        <div class="header-tagline">用五分鐘，掌握今天的世界</div>
-      </div>
+
+<div id="rbar"></div>
+
+{special_banner}
+
+<!-- Nav -->
+<nav class="topnav">
+  <a class="tn-brand" href="index.html">
+    {YUZU_LOGO_LG}
+    <div>
+      <div class="tn-name">Yuzu Brief</div>
+      <div class="tn-sub">Daily News</div>
     </div>
-    <div class="body-card">
-      <div class="section">
-        <div class="section-header"><span class="section-icon">🌍</span><span class="section-title">全球五大新聞</span></div>
-        {news_html}
+  </a>
+  <div class="tn-links">
+    <a class="tn-link" href="{DASHBOARD_URL}" target="_blank">Yuzu Finance</a>
+    <a class="tn-link cur" href="#">Yuzu Brief</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-bg">
+    <svg viewBox="0 0 800 380" preserveAspectRatio="xMidYMid slice" fill="none">
+      <circle cx="700" cy="50" r="200" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="130" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="60"  stroke="white" stroke-width="1"/>
+      <circle cx="100" cy="320" r="150" stroke="white" stroke-width=".7"/>
+      <line x1="700" y1="50" x2="540" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="860" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="700" y2="230" stroke="white" stroke-width=".6"/>
+    </svg>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-layout">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Yuzu Brief · Daily News</div>
+        <div class="hero-date">
+          <span class="yr">{year_zh}</span>
+          <span class="md">{md_zh}</span>
+        </div>
+        <div class="hero-weekday">
+          <span class="hero-badge">星期{weekday}</span>
+          <span class="hero-slogan">用五分鐘，掌握今天的世界</span>
+        </div>
       </div>
-      <div class="section">
-        <div class="section-header"><span class="section-icon">🧠</span><span class="section-title">每日冷知識</span></div>
-        <div class="fact-card">
+      <div class="hero-animal">{animal}</div>
+    </div>
+    <div class="hero-rule"></div>
+    <div class="hero-sections">
+      <div class="hs-item hi"><span>🌍</span> 全球五大新聞</div>
+      <div class="hs-item" style="color:rgba(255,255,255,.75)"><span>🧠</span> 每日冷知識</div>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="body-wrap">
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🌍</span>
+      <span class="sec-label">全球五大新聞</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="news-list">
+{news_html}
+    </div>
+  </div>
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🧠</span>
+      <span class="sec-label">每日冷知識</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="fact-wrap">
+      <div class="fact-inner">
+        <div class="fact-stripe"></div>
+        <div class="fact-content">
+          <div class="fact-kicker">Today's Fun Fact</div>
           <div class="fact-title">{fact['title']}</div>
           <div class="fact-body">{fact['body']}</div>
         </div>
       </div>
-    </div>
-    <div class="footer">
-      <a href="index.html" style="color:#bbb;text-decoration:none;">← 返回所有簡報</a> &nbsp;·&nbsp; 柚子 Daily Brief &nbsp;·&nbsp; {date_str}
+      <div class="fact-animal">{animal}</div>
     </div>
   </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="sf-brand">
+    {YUZU_LOGO_SM}
+    <div>
+      <div class="sf-name">Yuzu Brief · Daily News</div>
+      <div class="sf-date">{date_str}</div>
+    </div>
+  </div>
+  <div class="sf-links">
+    <a href="index.html">← 所有簡報</a>
+    <a href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('scroll', function() {{
+  var d = document.documentElement;
+  document.getElementById('rbar').style.width =
+    Math.min((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100, 100) + '%';
+}});
+
+document.body.classList.add('js-animate');
+
+var secObs = new IntersectionObserver(function(entries) {{
+  entries.forEach(function(e) {{ if (e.isIntersecting) {{ e.target.classList.add('in'); secObs.unobserve(e.target); }} }});
+}}, {{ threshold: 0, rootMargin: '0px 0px -40px 0px' }});
+document.querySelectorAll('.reveal').forEach(function(el) {{ secObs.observe(el); }});
+
+var listObs = new IntersectionObserver(function(entries) {{
+  entries.forEach(function(e) {{
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.ni').forEach(function(item, i) {{
+      setTimeout(function() {{ item.classList.add('in'); }}, i * 100);
+    }});
+    e.target.querySelectorAll('.fact-wrap').forEach(function(c) {{
+      setTimeout(function() {{ c.classList.add('in'); }}, 150);
+    }});
+    listObs.unobserve(e.target);
+  }});
+}}, {{ threshold: 0, rootMargin: '0px 0px -40px 0px' }});
+document.querySelectorAll('.a-sec').forEach(function(el) {{ listObs.observe(el); }});
+
+setTimeout(function() {{
+  document.querySelectorAll('.reveal:not(.in)').forEach(function(el) {{ el.classList.add('in'); }});
+  document.querySelectorAll('.ni:not(.in)').forEach(function(el, i) {{
+    setTimeout(function() {{ el.classList.add('in'); }}, i * 60);
+  }});
+  document.querySelectorAll('.fact-wrap:not(.in)').forEach(function(el) {{ el.classList.add('in'); }});
+}}, 900);
+</script>
 </body>
 </html>"""
 
@@ -366,16 +571,14 @@ def build_brief_html(data, dt):
 # index.html 生成（掃描所有 YYYY-MM-DD.html，重建首頁）
 # ════════════════════════════════════════════════════════════════════
 def build_index_html(repo_dir):
-    today    = datetime.now(TZ_TW).date()
-    cutoff   = today - timedelta(days=13)
+    today  = datetime.now(TZ_TW).date()
+    cutoff = today - timedelta(days=13)
 
-    # 1. 掃描所有日期檔
     files = sorted(
         [f for f in os.listdir(repo_dir) if re.match(r"^\d{4}-\d{2}-\d{2}\.html$", f)],
         reverse=True
     )
 
-    # 2. 萃取 metadata
     def get_info(filename):
         d = datetime.strptime(filename[:10], "%Y-%m-%d").date()
         headline, sub = "點擊閱讀", ""
@@ -383,6 +586,8 @@ def build_index_html(repo_dir):
             with open(os.path.join(repo_dir, filename), encoding="utf-8") as f:
                 content = f.read()
             titles = re.findall(r'class="news-title">(.*?)</div>', content)
+            if not titles:
+                titles = re.findall(r'class="ni-title">(.*?)</div>', content)
             titles = [re.sub(r"<[^>]+>", "", t).replace("📌 更新｜", "").strip() for t in titles]
             if titles:
                 headline = titles[0][:38] + ("…" if len(titles[0]) > 38 else "")
@@ -403,7 +608,6 @@ def build_index_html(repo_dir):
 
     infos = [get_info(f) for f in files]
 
-    # 3. Brief row HTML
     def make_row(item):
         return (
             f'<a href="{item["filename"]}" class="brief-row">'
@@ -423,7 +627,6 @@ def build_index_html(repo_dir):
     if not recent_rows:
         recent_rows = '<div class="empty-hint">尚無近期簡報</div>'
 
-    # 4. 月份卡 + panel
     month_cards  = ""
     month_panels = ""
     month_groups = []
@@ -459,113 +662,237 @@ def build_index_html(repo_dir):
             f'</div>{rows}</div>\n'
         )
 
-    # 今日 hero
     today_animal = MONTH_ANIMALS[today.month][today.weekday()]
     today_info   = infos[0] if infos else None
     cta_href     = today_info["filename"] if today_info else "#"
-    cta_label    = f"{today_info['headline'][:20]}…" if today_info else "閱讀最新簡報"
+
+    # Weekday EN abbreviation
+    wd_en = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
+
+    def make_row_new(item):
+        wd = wd_en[item["date"].weekday()]
+        return (
+            f'<a href="{item["filename"]}" class="brief-row">'
+            f'<div class="brief-date-block">'
+            f'<div class="bdb-day">{item["day"]}</div>'
+            f'<div class="bdb-wd">{wd}</div>'
+            f'</div>'
+            f'<div class="brief-text">'
+            f'<div class="brief-info-title">{item["headline"]}</div>'
+            f'<div class="brief-info-sub">{item["sub"]}</div>'
+            f'</div>'
+            f'<div class="brief-row-arrow">›</div>'
+            f'</a>'
+        )
+
+    recent_rows_new = "\n".join(make_row_new(i) for i in infos if i["is_recent"])
+    if not recent_rows_new:
+        recent_rows_new = '<div class="empty-hint">尚無近期簡報</div>'
+
+    # Featured card (today)
+    featured_date_zh = f"{today_info['year']}年{today_info['month']}月{today_info['day']}日 · 星期{today_info['weekday_zh']}" if today_info else ""
+    featured_headline = today_info['headline'] if today_info else ""
+    featured_animal2  = MONTH_ANIMALS[today.month][today.weekday()]
+
+    # Month panels new style
+    month_panels_new = ""
+    for g in month_groups:
+        rows = "\n".join(make_row_new(i) for i in g["items"])
+        month_panels_new += (
+            f'<div class="month-panel" id="panel-{g["key"]}">'
+            f'<div class="mp-head">'
+            f'<div class="mp-title">{g["label"]}</div>'
+            f'<button class="mp-close" onclick="toggleMonth(\'{g["key"]}\')">✕ 收起</button>'
+            f'</div>'
+            f'<div class="mp-rows">{rows}</div>'
+            f'</div>\n'
+        )
+
+    brief_total   = sum(g["count"] for g in month_groups)
+    current_label = f"{today.year}年{today.month}月"
+
+    yuzu_logo_index = """<svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+      <defs><radialGradient id="lgi" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#f0d050"/><stop offset="100%" stop-color="#a06010"/></radialGradient></defs>
+      <circle cx="17" cy="17" r="17" fill="url(#lgi)"/>
+      <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+      <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+      <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+    </svg>"""
 
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>柚子 Daily Brief</title>
+  <title>Yuzu Brief — 每日簡報</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    * {{ margin:0; padding:0; box-sizing:border-box; }}
-    body {{ background:#f0ede8; font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color:#1a1a1a; min-height:100vh; padding:32px 16px 64px; }}
-    .container {{ max-width:680px; margin:0 auto; }}
-    /* Hero */
-    .hero {{ background:#1b2d4f; border-radius:16px; padding:40px 40px 32px; position:relative; overflow:hidden; margin-bottom:20px; }}
-    .hero::before {{ content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }}
-    .hero-animal {{ position:absolute; top:24px; right:28px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }}
-    .hero-title {{ font-size:32px; font-weight:800; color:#fff; line-height:1.1; padding-right:100px; }}
-    .hero-sub {{ font-size:14px; color:rgba(255,255,255,0.45); margin-top:8px; padding-right:100px; }}
-    .hero-cta {{ display:inline-block; margin-top:24px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:600; transition:background .15s; }}
-    .hero-cta:hover {{ background:rgba(255,255,255,0.2); }}
-    /* Section cards */
-    .card {{ background:#fff; border-radius:16px; padding:28px 32px; box-shadow:0 4px 24px rgba(0,0,0,0.06); margin-bottom:16px; }}
-    .card-title {{ font-size:12px; font-weight:700; letter-spacing:.1em; color:#999; text-transform:uppercase; margin-bottom:16px; }}
-    /* Brief rows */
-    .brief-row {{ display:flex; align-items:center; gap:14px; padding:11px 8px; border-bottom:1px solid #f8f6f3; text-decoration:none; color:inherit; border-radius:8px; margin:0 -8px; transition:background .12s; }}
-    .brief-row:last-child {{ border-bottom:none; }}
-    .brief-row:hover {{ background:#f8f6f2; }}
-    .brief-date-badge {{ flex-shrink:0; width:46px; height:46px; background:#1b2d4f; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; }}
-    .badge-day {{ font-size:18px; font-weight:700; line-height:1; }}
-    .badge-weekday {{ font-size:10px; color:rgba(255,255,255,0.55); margin-top:2px; }}
-    .brief-info {{ flex:1; min-width:0; }}
-    .brief-info-title {{ font-size:14px; font-weight:600; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }}
-    .brief-info-sub {{ font-size:12px; color:#999; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }}
-    .brief-arrow {{ color:#ccc; font-size:20px; flex-shrink:0; }}
-    /* Month grid */
+    *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
+    :root {{ --bg:#f2ede4; --bg2:#e9e3d8; --navy:#1b2d4f; --navy2:#0f1d34; --ink:#0f172a; --ink2:#374151; --ink3:#94a3b8; --border:#dcd5c4; --gold:#b8922e; --gold-l:#e8c84a; }}
+    body {{ background:var(--bg); font-family:'DM Sans','Noto Sans TC',sans-serif; color:var(--ink); min-height:100vh; }}
+    .topnav {{ height:56px; padding:0 32px; background:rgba(242,237,228,.93); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }}
+    .tn-brand {{ display:flex; align-items:center; gap:11px; text-decoration:none; }}
+    .tn-name {{ font-size:15px; font-weight:700; color:var(--ink); }}
+    .tn-sub  {{ font-size:9px; color:var(--ink3); letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }}
+    .tn-fin  {{ font-size:12px; color:var(--ink3); text-decoration:none; letter-spacing:.04em; transition:color .15s; }}
+    .tn-fin:hover {{ color:var(--ink); }}
+    .hero {{ background:var(--navy2); padding:0 32px; position:relative; overflow:hidden; }}
+    .hero-bg-text {{ position:absolute; bottom:-20px; left:-10px; font-family:'Playfair Display',serif; font-size:clamp(120px,20vw,200px); font-weight:900; color:rgba(255,255,255,.03); line-height:1; letter-spacing:-.04em; pointer-events:none; user-select:none; white-space:nowrap; }}
+    .hero-circles {{ position:absolute; top:-100px; right:-100px; width:480px; height:480px; pointer-events:none; }}
+    .hero-inner {{ max-width:700px; margin:0 auto; padding:52px 0 0; display:grid; grid-template-columns:1fr auto; gap:20px; align-items:flex-start; position:relative; z-index:1; }}
+    .hero-eyebrow {{ font-size:9px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:14px; display:flex; align-items:center; gap:10px; }}
+    .hero-eyebrow::before {{ content:''; width:16px; height:1px; background:rgba(255,255,255,.2); flex-shrink:0; }}
+    .hero-title {{ font-family:'Playfair Display',serif; font-size:clamp(30px,6vw,52px); font-weight:900; color:#fff; line-height:1.05; letter-spacing:-.03em; margin-bottom:20px; }}
+    .hero-title em {{ font-style:italic; color:rgba(255,255,255,.55); }}
+    .hero-cta {{ display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,rgba(201,168,76,.25),rgba(201,168,76,.1)); border:1.5px solid rgba(201,168,76,.4); color:rgba(255,255,255,.85); text-decoration:none; padding:11px 24px; border-radius:30px; font-size:13px; font-weight:600; transition:all .2s; }}
+    .hero-cta:hover {{ background:linear-gradient(135deg,rgba(201,168,76,.35),rgba(201,168,76,.18)); transform:translateY(-1px); }}
+    .hero-animal {{ width:100px; height:100px; flex-shrink:0; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:56px; line-height:1; margin-top:6px; }}
+    @media(max-width:440px){{ .hero-animal {{ display:none; }} }}
+    .hero-bottom {{ max-width:700px; margin:0 auto; border-top:1px solid rgba(255,255,255,.07); padding:14px 0; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }}
+    .hero-bottom::before {{ content:''; position:absolute; top:0; left:0; right:60%; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5),transparent); }}
+    .hb-stat {{ font-size:10px; color:rgba(255,255,255,.3); letter-spacing:.08em; }}
+    .hb-stat strong {{ color:rgba(255,255,255,.6); }}
+    .content {{ max-width:700px; margin:0 auto; padding:32px 32px 80px; }}
+    .featured {{ background:var(--navy); border-radius:20px; overflow:hidden; margin-bottom:20px; text-decoration:none; color:inherit; display:grid; grid-template-columns:1fr auto; transition:transform .2s,box-shadow .2s; box-shadow:0 4px 24px rgba(15,29,52,.18); }}
+    .featured:hover {{ transform:translateY(-3px); box-shadow:0 12px 40px rgba(15,29,52,.28); }}
+    .featured-body {{ padding:28px 32px; }}
+    .featured-eyebrow {{ font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:rgba(201,168,76,.8); margin-bottom:12px; display:flex; align-items:center; gap:8px; }}
+    .featured-eyebrow::before {{ content:''; width:14px; height:1px; background:rgba(201,168,76,.5); }}
+    .featured-date {{ font-family:'Playfair Display',serif; font-size:clamp(20px,3.5vw,28px); font-weight:700; color:#fff; margin-bottom:10px; line-height:1.2; }}
+    .featured-headline {{ font-size:13px; line-height:1.7; color:rgba(255,255,255,.5); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }}
+    .featured-tag {{ margin-top:16px; display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:rgba(201,168,76,.9); letter-spacing:.04em; }}
+    .featured-side {{ background:rgba(255,255,255,.04); border-left:1px solid rgba(255,255,255,.06); padding:28px 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:80px; }}
+    .featured-animal {{ font-size:40px; line-height:1; }}
+    .featured-weekday {{ font-size:10px; color:rgba(255,255,255,.3); letter-spacing:.08em; text-transform:uppercase; }}
+    .section-head {{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }}
+    .sh-label {{ font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); }}
+    .sh-rule  {{ flex:1; height:1px; background:var(--border); }}
+    .brief-list {{ display:flex; flex-direction:column; gap:2px; }}
+    .brief-row {{ display:grid; grid-template-columns:56px 1fr 20px; align-items:center; gap:16px; padding:14px 16px; border-radius:12px; text-decoration:none; color:inherit; background:#fff; border:1px solid var(--border); transition:all .15s; }}
+    .brief-row:hover {{ background:#faf7f2; border-color:var(--navy); transform:translateX(3px); }}
+    .brief-date-block {{ display:flex; flex-direction:column; align-items:center; }}
+    .bdb-day {{ font-family:'Playfair Display',serif; font-size:28px; font-weight:900; line-height:1; color:var(--navy); letter-spacing:-.02em; }}
+    .bdb-wd  {{ font-size:9px; color:var(--ink3); letter-spacing:.08em; text-transform:uppercase; margin-top:1px; }}
+    .brief-text {{ min-width:0; }}
+    .brief-info-title {{ font-size:14px; font-weight:600; color:var(--ink); line-height:1.4; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }}
+    .brief-info-sub   {{ font-size:11px; color:var(--ink3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }}
+    .brief-row-arrow  {{ color:var(--border); font-size:18px; transition:color .15s,transform .15s; }}
+    .brief-row:hover .brief-row-arrow {{ color:var(--navy); transform:translateX(2px); }}
     .month-grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }}
-    .month-card {{ background:#4a5e72; border-radius:12px; padding:16px 14px 14px; cursor:pointer; position:relative; overflow:hidden; transition:background .15s, transform .12s, box-shadow .12s; border:2px solid transparent; }}
-    .month-card:hover {{ background:#566a7f; transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,94,114,.35); }}
-    .month-card.active {{ border-color:#93c5fd; background:#566a7f; }}
-    .month-card--current {{ background:#3e5568; }}
-    .month-card-ongoing {{ display:inline-flex; align-items:center; gap:4px; background:rgba(110,211,130,.18); border:1px solid rgba(110,211,130,.4); border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; color:#7de89a; margin-bottom:8px; }}
-    .month-card-ongoing::before {{ content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; }}
-    @keyframes pulse {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:.3; }} }}
-    .month-card-animal {{ font-size:22px; line-height:1; margin-bottom:6px; }}
-    .month-card-year {{ font-size:11px; color:rgba(255,255,255,.5); }}
-    .month-card-name {{ font-size:16px; font-weight:700; color:#fff; margin:2px 0; }}
-    .month-card-count {{ font-size:11px; color:rgba(255,255,255,.5); }}
-    /* Month panel */
-    .month-panel {{ display:none; background:#fff; border-radius:12px; padding:16px 20px; margin-top:8px; }}
+    .month-card {{ border-radius:16px; padding:20px 16px 16px; cursor:pointer; position:relative; overflow:hidden; transition:transform .18s,box-shadow .18s; border:1.5px solid transparent; }}
+    .month-card:nth-child(3n+1) {{ background:linear-gradient(145deg,#2a4060,#1b2d4f); }}
+    .month-card:nth-child(3n+2) {{ background:linear-gradient(145deg,#2d3d55,#1e2e45); }}
+    .month-card:nth-child(3n+3) {{ background:linear-gradient(145deg,#253550,#172540); }}
+    .month-card:hover {{ transform:translateY(-3px); box-shadow:0 10px 30px rgba(15,29,52,.35); }}
+    .month-card.active {{ border-color:rgba(201,168,76,.5); }}
+    .month-card--current {{ background:linear-gradient(145deg,#1b3a6e,#0f2550) !important; }}
+    .month-card-ongoing {{ display:inline-flex; align-items:center; gap:5px; background:rgba(110,211,130,.15); border:1px solid rgba(110,211,130,.35); border-radius:20px; padding:3px 10px; font-size:9px; font-weight:700; color:#7de89a; margin-bottom:10px; letter-spacing:.06em; }}
+    .month-card-ongoing::before {{ content:''; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; flex-shrink:0; }}
+    @keyframes pulse {{ 0%,100%{{opacity:1;}} 50%{{opacity:.3;}} }}
+    .month-card-animal {{ font-size:26px; line-height:1; margin-bottom:8px; }}
+    .month-card-year   {{ font-size:10px; color:rgba(255,255,255,.38); letter-spacing:.08em; }}
+    .month-card-name   {{ font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#fff; margin:4px 0 3px; }}
+    .month-card-count  {{ font-size:11px; color:rgba(255,255,255,.38); }}
+    .month-panel {{ display:none; border-radius:14px; overflow:hidden; margin-top:10px; border:1px solid var(--border); background:#fff; }}
     .month-panel.open {{ display:block; }}
-    .month-panel-header {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #f0ede8; }}
-    .month-panel-title {{ font-size:14px; font-weight:700; color:#1b2d4f; }}
-    .month-panel-close {{ background:none; border:none; cursor:pointer; font-size:12px; color:#999; padding:4px 8px; border-radius:6px; }}
-    .month-panel-close:hover {{ background:#f0ede8; }}
-    /* Dashboard button */
-    .dashboard-btn {{ position:fixed; bottom:24px; right:24px; background:#1b2d4f; color:#fff; text-decoration:none; padding:12px 20px; border-radius:30px; font-size:13px; font-weight:700; box-shadow:0 4px 16px rgba(0,0,0,0.25); transition:background .15s,transform .12s; z-index:999; display:flex; align-items:center; gap:8px; }}
-    .dashboard-btn:hover {{ background:#243d6a; transform:translateY(-2px); }}
+    .mp-head {{ display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--navy); }}
+    .mp-title {{ font-size:14px; font-weight:700; color:#fff; }}
+    .mp-close {{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:20px; cursor:pointer; font-size:11px; color:rgba(255,255,255,.6); padding:4px 12px; transition:background .12s; }}
+    .mp-close:hover {{ background:rgba(255,255,255,.2); }}
+    .mp-rows {{ padding:10px 12px; display:flex; flex-direction:column; gap:2px; }}
+    .site-footer {{ max-width:700px; margin:0 auto; padding:20px 32px 48px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }}
+    .sf-brand {{ display:flex; align-items:center; gap:10px; }}
+    .sf-name  {{ font-size:12px; font-weight:600; color:var(--ink3); }}
+    .sf-links {{ display:flex; gap:18px; }}
+    .sf-links a {{ font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }}
+    .sf-links a:hover {{ color:var(--ink); }}
     .empty-hint {{ color:#bbb; font-size:13px; padding:16px 8px; }}
-    .footer {{ text-align:center; margin-top:24px; font-size:12px; color:#bbb; }}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="hero">
-      <div class="hero-animal">{today_animal}</div>
-      <div class="hero-title">柚子 Daily Brief</div>
-      <div class="hero-sub">每天五分鐘，掌握今天的世界</div>
+<nav class="topnav">
+  <div class="tn-brand">
+    {yuzu_logo_index}
+    <div><div class="tn-name">Yuzu Brief</div><div class="tn-sub">Daily News</div></div>
+  </div>
+  <a class="tn-fin" href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a>
+</nav>
+<div class="hero">
+  <div class="hero-bg-text">YUZU</div>
+  <svg class="hero-circles" viewBox="0 0 480 480" fill="none">
+    <circle cx="380" cy="100" r="200" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+    <circle cx="380" cy="100" r="130" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+    <circle cx="380" cy="100" r="60"  stroke="rgba(201,168,76,.08)"  stroke-width="1"/>
+    <line x1="380" y1="100" x2="220" y2="240" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+    <line x1="380" y1="100" x2="540" y2="240" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+    <line x1="380" y1="100" x2="380" y2="280" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+  </svg>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Yuzu Brief · Daily News</div>
+      <div class="hero-title">用五分鐘<br><em>掌握今天的世界</em></div>
       <a href="{cta_href}" class="hero-cta">閱讀今日簡報 →</a>
     </div>
-
-    <div class="card">
-      <div class="card-title">最近 14 天</div>
-      {recent_rows}
-    </div>
-
-    <div class="card">
-      <div class="card-title">歷史簡報</div>
-      <div class="month-grid">
-{month_cards}
-      </div>
-{month_panels}
-    </div>
-
-    <div class="footer">柚子 Daily Brief · 由 Gemini AI 生成 · <a href="{DASHBOARD_URL}" style="color:#bbb;">📊 投資儀表板</a></div>
+    <div class="hero-animal">{today_animal}</div>
   </div>
-  <a href="{DASHBOARD_URL}" class="dashboard-btn" target="_blank">📊 投資儀表板</a>
-  <script>
-    let activeMonth = null;
-    function toggleMonth(key) {{
-      const card  = document.querySelector('.month-card[data-month="' + key + '"]');
-      const panel = document.getElementById('panel-' + key);
-      if (!card || !panel) return;
-      if (activeMonth && activeMonth !== key) {{
-        document.querySelector('.month-card[data-month="' + activeMonth + '"]')?.classList.remove('active');
-        document.getElementById('panel-' + activeMonth)?.classList.remove('open');
-      }}
-      const isOpen = panel.classList.contains('open');
-      card.classList.toggle('active', !isOpen);
-      panel.classList.toggle('open', !isOpen);
-      activeMonth = isOpen ? null : key;
-      if (!isOpen) setTimeout(() => panel.scrollIntoView({{ behavior:'smooth', block:'nearest' }}), 50);
+  <div class="hero-bottom">
+    <div class="hb-stat">共 <strong>{brief_total}</strong> 篇簡報 · <strong>{current_label}</strong></div>
+    <div class="hb-stat">每天早上 09:00 更新</div>
+  </div>
+</div>
+<div class="content">
+  <a href="{cta_href}" class="featured">
+    <div class="featured-body">
+      <div class="featured-eyebrow">今日簡報</div>
+      <div class="featured-date">{featured_date_zh}</div>
+      <div class="featured-headline">{featured_headline}</div>
+      <div class="featured-tag">立即閱讀 →</div>
+    </div>
+    <div class="featured-side">
+      <div class="featured-animal">{featured_animal2}</div>
+      <div class="featured-weekday">今日</div>
+    </div>
+  </a>
+  <div class="section-head" style="margin-top:32px;">
+    <div class="sh-label">最近 14 天</div><div class="sh-rule"></div>
+  </div>
+  <div class="brief-list">{recent_rows_new}</div>
+  <div class="section-head" style="margin-top:40px;">
+    <div class="sh-label">歷史簡報</div><div class="sh-rule"></div>
+  </div>
+  <div class="month-grid">
+{month_cards}
+  </div>
+{month_panels_new}
+</div>
+<footer class="site-footer">
+  <div class="sf-brand">{yuzu_logo_index}<div class="sf-name">Yuzu Brief</div></div>
+  <div class="sf-links"><a href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a></div>
+</footer>
+<script>
+  var activeMonth = null;
+  function toggleMonth(key) {{
+    var card  = document.querySelector('.month-card[data-month="' + key + '"]');
+    var panel = document.getElementById('panel-' + key);
+    if (!card || !panel) return;
+    if (activeMonth && activeMonth !== key) {{
+      var pc = document.querySelector('.month-card[data-month="' + activeMonth + '"]');
+      var pp = document.getElementById('panel-' + activeMonth);
+      if (pc) pc.classList.remove('active');
+      if (pp) pp.classList.remove('open');
     }}
-  </script>
+    var isOpen = panel.classList.contains('open');
+    card.classList.toggle('active', !isOpen);
+    panel.classList.toggle('open', !isOpen);
+    activeMonth = isOpen ? null : key;
+    if (!isOpen) setTimeout(function() {{ panel.scrollIntoView({{ behavior:'smooth', block:'nearest' }}); }}, 50);
+  }}
+</script>
 </body>
 </html>"""
 
@@ -581,29 +908,24 @@ def main():
 
     print(f"📰 {date_str}（星期{weekday}）每日簡報生成開始")
 
-    # 0. 讀取冷知識歷史紀錄（永久去重用）
     used_facts_state = load_used_facts()
     used_count = len(used_facts_state.get("facts", []))
     print(f"  📚 歷史冷知識紀錄：{used_count} 筆（生成時將全部排除）")
 
-    # 1. 生成新聞內容
     print("  呼叫 Gemini + Google Search...")
     data = fetch_news(date_str, weekday, used_facts_state)
     fact_title = data['fact']['title']
     print(f"  ✓ 取得 {len(data['news'])} 則新聞，冷知識：{fact_title[:25]}…")
 
-    # 2. 寫出今日 HTML
-    html_file = f"{date_str}.html"
+    html_file  = f"{date_str}.html"
     brief_html = build_brief_html(data, now)
     with open(html_file, "w", encoding="utf-8") as f:
         f.write(brief_html)
     print(f"  ✓ {html_file} 已生成")
 
-    # 3. 更新冷知識歷史紀錄（永久保存，防止未來重複）
     save_used_fact(used_facts_state, date_str, fact_title)
     print(f"  ✓ brief_state.json 已更新（共 {used_count + 1} 筆冷知識紀錄）")
 
-    # 4. 重建 index.html
     index_html = build_index_html(".")
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(index_html)
