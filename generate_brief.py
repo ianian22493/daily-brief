@@ -48,29 +48,34 @@ SPECIAL_DATES = {
 # ════════════════════════════════════════════════════════════════════
 # Gemini — 搜尋並生成新聞內容
 # ════════════════════════════════════════════════════════════════════
-def get_recent_fact_titles(n=30):
-    """掃描目前目錄中最近 n 份簡報，收集已用過的冷知識標題（防止重複）"""
-    titles = []
+STATE_FILE = "brief_state.json"
+
+
+def load_used_facts():
+    """
+    從 brief_state.json 讀取所有歷史冷知識標題。
+    格式：{"facts": [{"date": "2026-04-16", "title": "..."}, ...]}
+    若檔案不存在，回傳空 dict（首次執行時會自動建立）。
+    """
     try:
-        files = sorted(
-            [f for f in os.listdir('.') if re.match(r'^\d{4}-\d{2}-\d{2}\.html$', f)],
-            reverse=True
-        )[:n]
-        for fname in files:
-            try:
-                with open(fname, encoding='utf-8') as f:
-                    content = f.read()
-                m = re.search(r'class="fact-title">([^<]+)</div>', content)
-                if m:
-                    titles.append(m.group(1).strip())
-            except Exception:
-                pass
+        with open(STATE_FILE, encoding="utf-8") as f:
+            return json.load(f)
     except Exception:
-        pass
-    return titles
+        return {"facts": []}
 
 
-def fetch_news(date_str, weekday_zh):
+def save_used_fact(state, date_str, fact_title):
+    """將今日冷知識標題寫入 brief_state.json，永久保存"""
+    # 避免同一天重複寫入
+    state["facts"] = [e for e in state["facts"] if e.get("date") != date_str]
+    state["facts"].append({"date": date_str, "title": fact_title})
+    # 依日期排序，方便閱讀
+    state["facts"].sort(key=lambda e: e["date"])
+    with open(STATE_FILE, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2)
+
+
+def fetch_news(date_str, weekday_zh, used_facts_state):
     """呼叫 Gemini（含 Google Search grounding）生成當日新聞 JSON"""
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -80,13 +85,13 @@ def fetch_news(date_str, weekday_zh):
     from google.genai import types
     client = genai.Client(api_key=api_key)
 
-    # 收集近期已用過的冷知識標題，要求 Gemini 避開相同或相似的主題
-    recent_facts = get_recent_fact_titles(30)
-    if recent_facts:
+    # 從永久狀態檔取得所有歷史冷知識標題，告知 Gemini 全部避開
+    all_titles = [e["title"] for e in used_facts_state.get("facts", [])]
+    if all_titles:
         avoid_block = (
-            "\n\n⚠️ 冷知識注意事項（重要）：以下是近期已出現過的冷知識主題，"
-            "請選擇完全不同的主題，不得重複或使用相似的事實：\n"
-            + "\n".join(f"- {t}" for t in recent_facts)
+            "\n\n⚠️ 冷知識注意事項（非常重要）：以下是過去所有已出現過的冷知識主題，"
+            "請絕對不要重複或使用相似的事實，必須選擇全新的主題：\n"
+            + "\n".join(f"- {t}" for t in all_titles)
         )
     else:
         avoid_block = ""
@@ -576,10 +581,16 @@ def main():
 
     print(f"📰 {date_str}（星期{weekday}）每日簡報生成開始")
 
+    # 0. 讀取冷知識歷史紀錄（永久去重用）
+    used_facts_state = load_used_facts()
+    used_count = len(used_facts_state.get("facts", []))
+    print(f"  📚 歷史冷知識紀錄：{used_count} 筆（生成時將全部排除）")
+
     # 1. 生成新聞內容
     print("  呼叫 Gemini + Google Search...")
-    data = fetch_news(date_str, weekday)
-    print(f"  ✓ 取得 {len(data['news'])} 則新聞，冷知識：{data['fact']['title'][:20]}…")
+    data = fetch_news(date_str, weekday, used_facts_state)
+    fact_title = data['fact']['title']
+    print(f"  ✓ 取得 {len(data['news'])} 則新聞，冷知識：{fact_title[:25]}…")
 
     # 2. 寫出今日 HTML
     html_file = f"{date_str}.html"
@@ -588,7 +599,11 @@ def main():
         f.write(brief_html)
     print(f"  ✓ {html_file} 已生成")
 
-    # 3. 重建 index.html
+    # 3. 更新冷知識歷史紀錄（永久保存，防止未來重複）
+    save_used_fact(used_facts_state, date_str, fact_title)
+    print(f"  ✓ brief_state.json 已更新（共 {used_count + 1} 筆冷知識紀錄）")
+
+    # 4. 重建 index.html
     index_html = build_index_html(".")
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(index_html)
