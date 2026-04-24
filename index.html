@@ -3,119 +3,234 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>柚子 Daily Brief</title>
+  <title>Yuzu Brief — 每日簡報</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#f0ede8; font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color:#1a1a1a; min-height:100vh; padding:32px 16px 64px; }
-    .container { max-width:680px; margin:0 auto; }
-    /* Hero */
-    .hero { background:#1b2d4f; border-radius:16px; padding:40px 40px 32px; position:relative; overflow:hidden; margin-bottom:20px; }
-    .hero::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
-    .hero-animal { position:absolute; top:24px; right:28px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }
-    .hero-title { font-size:32px; font-weight:800; color:#fff; line-height:1.1; padding-right:100px; }
-    .hero-sub { font-size:14px; color:rgba(255,255,255,0.45); margin-top:8px; padding-right:100px; }
-    .hero-cta { display:inline-block; margin-top:24px; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); color:#fff; text-decoration:none; padding:10px 22px; border-radius:30px; font-size:14px; font-weight:600; transition:background .15s; }
-    .hero-cta:hover { background:rgba(255,255,255,0.2); }
-    /* Section cards */
-    .card { background:#fff; border-radius:16px; padding:28px 32px; box-shadow:0 4px 24px rgba(0,0,0,0.06); margin-bottom:16px; }
-    .card-title { font-size:12px; font-weight:700; letter-spacing:.1em; color:#999; text-transform:uppercase; margin-bottom:16px; }
-    /* Brief rows */
-    .brief-row { display:flex; align-items:center; gap:14px; padding:11px 8px; border-bottom:1px solid #f8f6f3; text-decoration:none; color:inherit; border-radius:8px; margin:0 -8px; transition:background .12s; }
-    .brief-row:last-child { border-bottom:none; }
-    .brief-row:hover { background:#f8f6f2; }
-    .brief-date-badge { flex-shrink:0; width:46px; height:46px; background:#1b2d4f; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; }
-    .badge-day { font-size:18px; font-weight:700; line-height:1; }
-    .badge-weekday { font-size:10px; color:rgba(255,255,255,0.55); margin-top:2px; }
-    .brief-info { flex:1; min-width:0; }
-    .brief-info-title { font-size:14px; font-weight:600; color:#111; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .brief-info-sub { font-size:12px; color:#999; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .brief-arrow { color:#ccc; font-size:20px; flex-shrink:0; }
-    /* Month grid */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root { --bg:#f2ede4; --bg2:#e9e3d8; --navy:#1b2d4f; --navy2:#0f1d34; --ink:#0f172a; --ink2:#374151; --ink3:#94a3b8; --border:#dcd5c4; --gold:#b8922e; --gold-l:#e8c84a; }
+    body { background:var(--bg); font-family:'DM Sans','Noto Sans TC',sans-serif; color:var(--ink); min-height:100vh; }
+    .topnav { height:56px; padding:0 32px; background:rgba(242,237,228,.93); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; }
+    .tn-brand { display:flex; align-items:center; gap:11px; text-decoration:none; }
+    .tn-name { font-size:15px; font-weight:700; color:var(--ink); }
+    .tn-sub  { font-size:9px; color:var(--ink3); letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }
+    .tn-fin  { font-size:12px; color:var(--ink3); text-decoration:none; letter-spacing:.04em; transition:color .15s; }
+    .tn-fin:hover { color:var(--ink); }
+    .hero { background:var(--navy2); padding:0 32px; position:relative; overflow:hidden; }
+    .hero-bg-text { position:absolute; bottom:-20px; left:-10px; font-family:'Playfair Display',serif; font-size:clamp(120px,20vw,200px); font-weight:900; color:rgba(255,255,255,.03); line-height:1; letter-spacing:-.04em; pointer-events:none; user-select:none; white-space:nowrap; }
+    .hero-circles { position:absolute; top:-100px; right:-100px; width:480px; height:480px; pointer-events:none; }
+    .hero-inner { max-width:700px; margin:0 auto; padding:52px 0 0; display:grid; grid-template-columns:1fr auto; gap:20px; align-items:flex-start; position:relative; z-index:1; }
+    .hero-eyebrow { font-size:9px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .hero-eyebrow::before { content:''; width:16px; height:1px; background:rgba(255,255,255,.2); flex-shrink:0; }
+    .hero-title { font-family:'Playfair Display',serif; font-size:clamp(30px,6vw,52px); font-weight:900; color:#fff; line-height:1.05; letter-spacing:-.03em; margin-bottom:20px; }
+    .hero-title em { font-style:italic; color:rgba(255,255,255,.55); }
+    .hero-cta { display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,rgba(201,168,76,.25),rgba(201,168,76,.1)); border:1.5px solid rgba(201,168,76,.4); color:rgba(255,255,255,.85); text-decoration:none; padding:11px 24px; border-radius:30px; font-size:13px; font-weight:600; transition:all .2s; }
+    .hero-cta:hover { background:linear-gradient(135deg,rgba(201,168,76,.35),rgba(201,168,76,.18)); transform:translateY(-1px); }
+    .hero-animal { width:100px; height:100px; flex-shrink:0; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:56px; line-height:1; margin-top:6px; }
+    @media(max-width:440px){ .hero-animal { display:none; } }
+    .hero-bottom { max-width:700px; margin:0 auto; border-top:1px solid rgba(255,255,255,.07); padding:14px 0; display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+    .hero-bottom::before { content:''; position:absolute; top:0; left:0; right:60%; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5),transparent); }
+    .hb-stat { font-size:10px; color:rgba(255,255,255,.3); letter-spacing:.08em; }
+    .hb-stat strong { color:rgba(255,255,255,.6); }
+    .content { max-width:700px; margin:0 auto; padding:32px 32px 80px; }
+    .featured { background:var(--navy); border-radius:20px; overflow:hidden; margin-bottom:20px; text-decoration:none; color:inherit; display:grid; grid-template-columns:1fr auto; transition:transform .2s,box-shadow .2s; box-shadow:0 4px 24px rgba(15,29,52,.18); }
+    .featured:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(15,29,52,.28); }
+    .featured-body { padding:28px 32px; }
+    .featured-eyebrow { font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:rgba(201,168,76,.8); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+    .featured-eyebrow::before { content:''; width:14px; height:1px; background:rgba(201,168,76,.5); }
+    .featured-date { font-family:'Playfair Display',serif; font-size:clamp(20px,3.5vw,28px); font-weight:700; color:#fff; margin-bottom:10px; line-height:1.2; }
+    .featured-headline { font-size:13px; line-height:1.7; color:rgba(255,255,255,.5); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .featured-tag { margin-top:16px; display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:rgba(201,168,76,.9); letter-spacing:.04em; }
+    .featured-side { background:rgba(255,255,255,.04); border-left:1px solid rgba(255,255,255,.06); padding:28px 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-width:80px; }
+    .featured-animal { font-size:40px; line-height:1; }
+    .featured-weekday { font-size:10px; color:rgba(255,255,255,.3); letter-spacing:.08em; text-transform:uppercase; }
+    .section-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+    .sh-label { font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); }
+    .sh-rule  { flex:1; height:1px; background:var(--border); }
+    .brief-list { display:flex; flex-direction:column; gap:2px; }
+    .brief-row { display:grid; grid-template-columns:56px 1fr 20px; align-items:center; gap:16px; padding:14px 16px; border-radius:12px; text-decoration:none; color:inherit; background:#fff; border:1px solid var(--border); transition:all .15s; }
+    .brief-row:hover { background:#faf7f2; border-color:var(--navy); transform:translateX(3px); }
+    .brief-date-block { display:flex; flex-direction:column; align-items:center; }
+    .bdb-day { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; line-height:1; color:var(--navy); letter-spacing:-.02em; }
+    .bdb-wd  { font-size:9px; color:var(--ink3); letter-spacing:.08em; text-transform:uppercase; margin-top:1px; }
+    .brief-text { min-width:0; }
+    .brief-info-title { font-size:14px; font-weight:600; color:var(--ink); line-height:1.4; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .brief-info-sub   { font-size:11px; color:var(--ink3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .brief-row-arrow  { color:var(--border); font-size:18px; transition:color .15s,transform .15s; }
+    .brief-row:hover .brief-row-arrow { color:var(--navy); transform:translateX(2px); }
     .month-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    .month-card { background:#4a5e72; border-radius:12px; padding:16px 14px 14px; cursor:pointer; position:relative; overflow:hidden; transition:background .15s, transform .12s, box-shadow .12s; border:2px solid transparent; }
-    .month-card:hover { background:#566a7f; transform:translateY(-2px); box-shadow:0 6px 20px rgba(74,94,114,.35); }
-    .month-card.active { border-color:#93c5fd; background:#566a7f; }
-    .month-card--current { background:#3e5568; }
-    .month-card-ongoing { display:inline-flex; align-items:center; gap:4px; background:rgba(110,211,130,.18); border:1px solid rgba(110,211,130,.4); border-radius:20px; padding:2px 8px; font-size:10px; font-weight:700; color:#7de89a; margin-bottom:8px; }
-    .month-card-ongoing::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
-    .month-card-animal { font-size:22px; line-height:1; margin-bottom:6px; }
-    .month-card-year { font-size:11px; color:rgba(255,255,255,.5); }
-    .month-card-name { font-size:16px; font-weight:700; color:#fff; margin:2px 0; }
-    .month-card-count { font-size:11px; color:rgba(255,255,255,.5); }
-    /* Month panel */
-    .month-panel { display:none; background:#fff; border-radius:12px; padding:16px 20px; margin-top:8px; }
+    .month-card { border-radius:16px; padding:20px 16px 16px; cursor:pointer; position:relative; overflow:hidden; transition:transform .18s,box-shadow .18s; border:1.5px solid transparent; }
+    .month-card:nth-child(3n+1) { background:linear-gradient(145deg,#2a4060,#1b2d4f); }
+    .month-card:nth-child(3n+2) { background:linear-gradient(145deg,#2d3d55,#1e2e45); }
+    .month-card:nth-child(3n+3) { background:linear-gradient(145deg,#253550,#172540); }
+    .month-card:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(15,29,52,.35); }
+    .month-card.active { border-color:rgba(201,168,76,.5); }
+    .month-card--current { background:linear-gradient(145deg,#1b3a6e,#0f2550) !important; }
+    .month-card-ongoing { display:inline-flex; align-items:center; gap:5px; background:rgba(110,211,130,.15); border:1px solid rgba(110,211,130,.35); border-radius:20px; padding:3px 10px; font-size:9px; font-weight:700; color:#7de89a; margin-bottom:10px; letter-spacing:.06em; }
+    .month-card-ongoing::before { content:''; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; flex-shrink:0; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+    .month-card-animal { font-size:26px; line-height:1; margin-bottom:8px; }
+    .month-card-year   { font-size:10px; color:rgba(255,255,255,.38); letter-spacing:.08em; }
+    .month-card-name   { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#fff; margin:4px 0 3px; }
+    .month-card-count  { font-size:11px; color:rgba(255,255,255,.38); }
+    .month-panel { display:none; border-radius:14px; overflow:hidden; margin-top:10px; border:1px solid var(--border); background:#fff; }
     .month-panel.open { display:block; }
-    .month-panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #f0ede8; }
-    .month-panel-title { font-size:14px; font-weight:700; color:#1b2d4f; }
-    .month-panel-close { background:none; border:none; cursor:pointer; font-size:12px; color:#999; padding:4px 8px; border-radius:6px; }
-    .month-panel-close:hover { background:#f0ede8; }
-    /* Dashboard button */
-    .dashboard-btn { position:fixed; bottom:24px; right:24px; background:#1b2d4f; color:#fff; text-decoration:none; padding:12px 20px; border-radius:30px; font-size:13px; font-weight:700; box-shadow:0 4px 16px rgba(0,0,0,0.25); transition:background .15s,transform .12s; z-index:999; display:flex; align-items:center; gap:8px; }
-    .dashboard-btn:hover { background:#243d6a; transform:translateY(-2px); }
+    .mp-head { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--navy); }
+    .mp-title { font-size:14px; font-weight:700; color:#fff; }
+    .mp-close { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:20px; cursor:pointer; font-size:11px; color:rgba(255,255,255,.6); padding:4px 12px; transition:background .12s; }
+    .mp-close:hover { background:rgba(255,255,255,.2); }
+    .mp-rows { padding:10px 12px; display:flex; flex-direction:column; gap:2px; }
+    .site-footer { max-width:700px; margin:0 auto; padding:20px 32px 48px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+    .sf-brand { display:flex; align-items:center; gap:10px; }
+    .sf-name  { font-size:12px; font-weight:600; color:var(--ink3); }
+    .sf-links { display:flex; gap:18px; }
+    .sf-links a { font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }
+    .sf-links a:hover { color:var(--ink); }
     .empty-hint { color:#bbb; font-size:13px; padding:16px 8px; }
-    .footer { text-align:center; margin-top:24px; font-size:12px; color:#bbb; }
+
+    /* Yuzu Finance FAB */
+    .yuzu-fab { position:fixed; bottom:28px; right:28px; z-index:999; display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#c9a84c 0%,#f0d878 48%,#b8922e 100%); color:#1b2d4f; text-decoration:none; padding:12px 20px 12px 13px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }
+    .yuzu-fab:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 12px 40px rgba(184,146,46,.65),0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.35); animation:none; }
+    .yuzu-fab-icon { flex-shrink:0; display:flex; align-items:center; }
+    .yuzu-fab-text { display:flex; flex-direction:column; line-height:1; }
+    .yuzu-fab-name { font-size:13px; font-weight:800; letter-spacing:.01em; }
+    .yuzu-fab-sub  { font-size:9px; font-weight:600; opacity:.6; letter-spacing:.1em; text-transform:uppercase; margin-top:3px; }
+    .yuzu-fab-arr  { font-size:15px; font-weight:300; opacity:.7; margin-left:2px; transition:transform .2s; }
+    .yuzu-fab:hover .yuzu-fab-arr { transform:translateX(3px); opacity:1; }
+    @keyframes fab-glow {
+      0%,100% { box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }
+      50%      { box-shadow:0 4px 32px rgba(184,146,46,.75),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="hero">
-      <div class="hero-animal">🦥</div>
-      <div class="hero-title">柚子 Daily Brief</div>
-      <div class="hero-sub">每天五分鐘，掌握今天的世界</div>
+<nav class="topnav">
+  <div class="tn-brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+      <defs><radialGradient id="lgi" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#f0d050"/><stop offset="100%" stop-color="#a06010"/></radialGradient></defs>
+      <circle cx="17" cy="17" r="17" fill="url(#lgi)"/>
+      <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+      <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+      <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+    <div><div class="tn-name">Yuzu Brief</div><div class="tn-sub">Daily News</div></div>
+  </div>
+  <a class="tn-fin" href="https://ianian22493.github.io/investment-dashboard/" target="_blank">Yuzu Finance →</a>
+</nav>
+<div class="hero">
+  <div class="hero-bg-text">YUZU</div>
+  <svg class="hero-circles" viewBox="0 0 480 480" fill="none">
+    <circle cx="380" cy="100" r="200" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+    <circle cx="380" cy="100" r="130" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+    <circle cx="380" cy="100" r="60"  stroke="rgba(201,168,76,.08)"  stroke-width="1"/>
+    <line x1="380" y1="100" x2="220" y2="240" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+    <line x1="380" y1="100" x2="540" y2="240" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+    <line x1="380" y1="100" x2="380" y2="280" stroke="rgba(255,255,255,.03)" stroke-width="1"/>
+  </svg>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Yuzu Brief · Daily News</div>
+      <div class="hero-title">用五分鐘<br><em>掌握今天的世界</em></div>
       <a href="2026-04-24.html" class="hero-cta">閱讀今日簡報 →</a>
     </div>
-
-    <div class="card">
-      <div class="card-title">最近 14 天</div>
-      <a href="2026-04-24.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">24</div><div class="badge-weekday">週五</div></div><div class="brief-info"><div class="brief-info-title">以黎停火協議延長三週，美國將促兩國實現和平</div><div class="brief-info-sub">中東戰事衝擊歐元區經濟，PMI指… · 川普下令擊沉荷莫茲海峽布雷船隻，…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-23.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">23</div><div class="badge-weekday">週四</div></div><div class="brief-info"><div class="brief-info-title">美伊衝突：美方延長停火，伊朗否認新和談，中東局勢持續緊張</div><div class="brief-info-sub">中國施壓台灣總統出訪，美國譴責北… · 美股與科技股強勢上漲，費城半導體…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-22.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">22</div><div class="badge-weekday">週三</div></div><div class="brief-info"><div class="brief-info-title">川普延長對伊朗停火並維持封鎖，伊朗拒絕會談</div><div class="brief-info-sub">中東戰事加劇拉丁美洲經濟分化，I… · 台灣總統賴清德出訪史瓦帝尼行程受…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-21.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">21</div><div class="badge-weekday">週二</div></div><div class="brief-info"><div class="brief-info-title">美伊停火倒數荷莫茲海峽危機升高，國際油價飆漲</div><div class="brief-info-sub">以色列再次打擊黎巴嫩真主黨，中東… · 中國科技巨頭三安光電收購Lumi…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-20.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">20</div><div class="badge-weekday">週一</div></div><div class="brief-info"><div class="brief-info-title">美伊衝突升溫：美軍扣押伊朗貨船，國際油價飆漲逾7%</div><div class="brief-info-sub">美國關稅政策逆轉：最高法院裁定違… · 朝鮮試射集束彈頭導彈，金正恩對成…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-19.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">19</div><div class="badge-weekday">週日</div></div><div class="brief-info"><div class="brief-info-title">烏克蘭基輔大規模槍擊：6死14傷，俄籍凶嫌已擊斃</div><div class="brief-info-sub">伊朗再封荷莫茲海峽：美拒撤港口封… · 以黎10日停火緊張維持中：以軍炮…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-18.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">18</div><div class="badge-weekday">週六</div></div><div class="brief-info"><div class="brief-info-title">英法主持荷莫茲峰會：40國籌組多國海上護航任務</div><div class="brief-info-sub">義大利暫停對以色列防衛協定：梅洛… · 教宗良十四世訪喀麥隆：呼籲結束十…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-17.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">17</div><div class="badge-weekday">週五</div></div><div class="brief-info"><div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div><div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法案… · 俄羅斯夜襲基輔：數百架無人機與數…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-16.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">16</div><div class="badge-weekday">週四</div></div><div class="brief-info"><div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div><div class="brief-info-sub">以色列與黎巴嫩34年來首次高層對… · 俄羅斯以逾660架無人機猛攻烏克…</div></div><div class="brief-arrow">›</div></a>
+    <div class="hero-animal">🦥</div>
+  </div>
+  <div class="hero-bottom">
+    <div class="hb-stat">共 <strong>9</strong> 篇簡報 · <strong>2026年4月</strong></div>
+    <div class="hb-stat">每天早上 09:00 更新</div>
+  </div>
+</div>
+<div class="content">
+  <a href="2026-04-24.html" class="featured">
+    <div class="featured-body">
+      <div class="featured-eyebrow">今日簡報</div>
+      <div class="featured-date">2026年4月24日 · 星期五</div>
+      <div class="featured-headline">美三航母齊聚中東對伊朗施壓，霍爾木茲海峽徵收過路費已入帳</div>
+      <div class="featured-tag">立即閱讀 →</div>
     </div>
-
-    <div class="card">
-      <div class="card-title">歷史簡報</div>
-      <div class="month-grid">
+    <div class="featured-side">
+      <div class="featured-animal">🦥</div>
+      <div class="featured-weekday">今日</div>
+    </div>
+  </a>
+  <div class="section-head" style="margin-top:32px;">
+    <div class="sh-label">最近 14 天</div><div class="sh-rule"></div>
+  </div>
+  <div class="brief-list"><a href="2026-04-24.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">24</div><div class="bdb-wd">FRI</div></div><div class="brief-text"><div class="brief-info-title">美三航母齊聚中東對伊朗施壓，霍爾木茲海峽徵收過路費已入帳</div><div class="brief-info-sub">中東戰事影響全球經濟，日通膨加速… · 多國警告：中共駭客利用家用設備掩…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-23.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">23</div><div class="bdb-wd">THU</div></div><div class="brief-text"><div class="brief-info-title">美伊衝突：美方延長停火，伊朗否認新和談，中東局勢持續緊張</div><div class="brief-info-sub">中國施壓台灣總統出訪，美國譴責北… · 美股與科技股強勢上漲，費城半導體…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-22.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">22</div><div class="bdb-wd">WED</div></div><div class="brief-text"><div class="brief-info-title">川普延長對伊朗停火並維持封鎖，伊朗拒絕會談</div><div class="brief-info-sub">中東戰事加劇拉丁美洲經濟分化，I… · 台灣總統賴清德出訪史瓦帝尼行程受…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-21.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">21</div><div class="bdb-wd">TUE</div></div><div class="brief-text"><div class="brief-info-title">美伊停火倒數荷莫茲海峽危機升高，國際油價飆漲</div><div class="brief-info-sub">以色列再次打擊黎巴嫩真主黨，中東… · 中國科技巨頭三安光電收購Lumi…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-20.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">20</div><div class="bdb-wd">MON</div></div><div class="brief-text"><div class="brief-info-title">美伊衝突升溫：美軍扣押伊朗貨船，國際油價飆漲逾7%</div><div class="brief-info-sub">美國關稅政策逆轉：最高法院裁定違… · 朝鮮試射集束彈頭導彈，金正恩對成…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-19.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">19</div><div class="bdb-wd">SUN</div></div><div class="brief-text"><div class="brief-info-title">烏克蘭基輔大規模槍擊：6死14傷，俄籍凶嫌已擊斃</div><div class="brief-info-sub">伊朗再封荷莫茲海峽：美拒撤港口封… · 以黎10日停火緊張維持中：以軍炮…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-18.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">18</div><div class="bdb-wd">SAT</div></div><div class="brief-text"><div class="brief-info-title">英法主持荷莫茲峰會：40國籌組多國海上護航任務</div><div class="brief-info-sub">義大利暫停對以色列防衛協定：梅洛… · 教宗良十四世訪喀麥隆：呼籲結束十…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-17.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">17</div><div class="bdb-wd">FRI</div></div><div class="brief-text"><div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div><div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法案… · 俄羅斯夜襲基輔：數百架無人機與數…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-16.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">16</div><div class="bdb-wd">THU</div></div><div class="brief-text"><div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div><div class="brief-info-sub">以色列與黎巴嫩34年來首次高層對… · 俄羅斯以逾660架無人機猛攻烏克…</div></div><div class="brief-row-arrow">›</div></a></div>
+  <div class="section-head" style="margin-top:40px;">
+    <div class="sh-label">歷史簡報</div><div class="sh-rule"></div>
+  </div>
+  <div class="month-grid">
 <div class="month-card month-card--current" data-month="2026-04" onclick="toggleMonth('2026-04')"><div class="month-card-ongoing">進行中</div><div class="month-card-animal">🌿</div><div class="month-card-year">2026</div><div class="month-card-name">四月</div><div class="month-card-count">9篇</div></div>
 
-      </div>
-<div class="month-panel" id="panel-2026-04"><div class="month-panel-header"><span class="month-panel-title">2026年4月</span><button class="month-panel-close" onclick="toggleMonth('2026-04')">✕ 收起</button></div><a href="2026-04-24.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">24</div><div class="badge-weekday">週五</div></div><div class="brief-info"><div class="brief-info-title">以黎停火協議延長三週，美國將促兩國實現和平</div><div class="brief-info-sub">中東戰事衝擊歐元區經濟，PMI指… · 川普下令擊沉荷莫茲海峽布雷船隻，…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-23.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">23</div><div class="badge-weekday">週四</div></div><div class="brief-info"><div class="brief-info-title">美伊衝突：美方延長停火，伊朗否認新和談，中東局勢持續緊張</div><div class="brief-info-sub">中國施壓台灣總統出訪，美國譴責北… · 美股與科技股強勢上漲，費城半導體…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-22.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">22</div><div class="badge-weekday">週三</div></div><div class="brief-info"><div class="brief-info-title">川普延長對伊朗停火並維持封鎖，伊朗拒絕會談</div><div class="brief-info-sub">中東戰事加劇拉丁美洲經濟分化，I… · 台灣總統賴清德出訪史瓦帝尼行程受…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-21.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">21</div><div class="badge-weekday">週二</div></div><div class="brief-info"><div class="brief-info-title">美伊停火倒數荷莫茲海峽危機升高，國際油價飆漲</div><div class="brief-info-sub">以色列再次打擊黎巴嫩真主黨，中東… · 中國科技巨頭三安光電收購Lumi…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-20.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">20</div><div class="badge-weekday">週一</div></div><div class="brief-info"><div class="brief-info-title">美伊衝突升溫：美軍扣押伊朗貨船，國際油價飆漲逾7%</div><div class="brief-info-sub">美國關稅政策逆轉：最高法院裁定違… · 朝鮮試射集束彈頭導彈，金正恩對成…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-19.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">19</div><div class="badge-weekday">週日</div></div><div class="brief-info"><div class="brief-info-title">烏克蘭基輔大規模槍擊：6死14傷，俄籍凶嫌已擊斃</div><div class="brief-info-sub">伊朗再封荷莫茲海峽：美拒撤港口封… · 以黎10日停火緊張維持中：以軍炮…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-18.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">18</div><div class="badge-weekday">週六</div></div><div class="brief-info"><div class="brief-info-title">英法主持荷莫茲峰會：40國籌組多國海上護航任務</div><div class="brief-info-sub">義大利暫停對以色列防衛協定：梅洛… · 教宗良十四世訪喀麥隆：呼籲結束十…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-17.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">17</div><div class="badge-weekday">週五</div></div><div class="brief-info"><div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div><div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法案… · 俄羅斯夜襲基輔：數百架無人機與數…</div></div><div class="brief-arrow">›</div></a>
-<a href="2026-04-16.html" class="brief-row"><div class="brief-date-badge"><div class="badge-day">16</div><div class="badge-weekday">週四</div></div><div class="brief-info"><div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div><div class="brief-info-sub">以色列與黎巴嫩34年來首次高層對… · 俄羅斯以逾660架無人機猛攻烏克…</div></div><div class="brief-arrow">›</div></a></div>
-
-    </div>
-
-    <div class="footer">柚子 Daily Brief · 由 Gemini AI 生成 · <a href="https://ianian22493.github.io/investment-dashboard/" style="color:#bbb;">📊 投資儀表板</a></div>
   </div>
-  <a href="https://ianian22493.github.io/investment-dashboard/" class="dashboard-btn" target="_blank">📊 投資儀表板</a>
-  <script>
-    let activeMonth = null;
-    function toggleMonth(key) {
-      const card  = document.querySelector('.month-card[data-month="' + key + '"]');
-      const panel = document.getElementById('panel-' + key);
-      if (!card || !panel) return;
-      if (activeMonth && activeMonth !== key) {
-        document.querySelector('.month-card[data-month="' + activeMonth + '"]')?.classList.remove('active');
-        document.getElementById('panel-' + activeMonth)?.classList.remove('open');
-      }
-      const isOpen = panel.classList.contains('open');
-      card.classList.toggle('active', !isOpen);
-      panel.classList.toggle('open', !isOpen);
-      activeMonth = isOpen ? null : key;
-      if (!isOpen) setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+<div class="month-panel" id="panel-2026-04"><div class="mp-head"><div class="mp-title">2026年4月</div><button class="mp-close" onclick="toggleMonth('2026-04')">✕ 收起</button></div><div class="mp-rows"><a href="2026-04-24.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">24</div><div class="bdb-wd">FRI</div></div><div class="brief-text"><div class="brief-info-title">美三航母齊聚中東對伊朗施壓，霍爾木茲海峽徵收過路費已入帳</div><div class="brief-info-sub">中東戰事影響全球經濟，日通膨加速… · 多國警告：中共駭客利用家用設備掩…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-23.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">23</div><div class="bdb-wd">THU</div></div><div class="brief-text"><div class="brief-info-title">美伊衝突：美方延長停火，伊朗否認新和談，中東局勢持續緊張</div><div class="brief-info-sub">中國施壓台灣總統出訪，美國譴責北… · 美股與科技股強勢上漲，費城半導體…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-22.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">22</div><div class="bdb-wd">WED</div></div><div class="brief-text"><div class="brief-info-title">川普延長對伊朗停火並維持封鎖，伊朗拒絕會談</div><div class="brief-info-sub">中東戰事加劇拉丁美洲經濟分化，I… · 台灣總統賴清德出訪史瓦帝尼行程受…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-21.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">21</div><div class="bdb-wd">TUE</div></div><div class="brief-text"><div class="brief-info-title">美伊停火倒數荷莫茲海峽危機升高，國際油價飆漲</div><div class="brief-info-sub">以色列再次打擊黎巴嫩真主黨，中東… · 中國科技巨頭三安光電收購Lumi…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-20.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">20</div><div class="bdb-wd">MON</div></div><div class="brief-text"><div class="brief-info-title">美伊衝突升溫：美軍扣押伊朗貨船，國際油價飆漲逾7%</div><div class="brief-info-sub">美國關稅政策逆轉：最高法院裁定違… · 朝鮮試射集束彈頭導彈，金正恩對成…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-19.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">19</div><div class="bdb-wd">SUN</div></div><div class="brief-text"><div class="brief-info-title">烏克蘭基輔大規模槍擊：6死14傷，俄籍凶嫌已擊斃</div><div class="brief-info-sub">伊朗再封荷莫茲海峽：美拒撤港口封… · 以黎10日停火緊張維持中：以軍炮…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-18.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">18</div><div class="bdb-wd">SAT</div></div><div class="brief-text"><div class="brief-info-title">英法主持荷莫茲峰會：40國籌組多國海上護航任務</div><div class="brief-info-sub">義大利暫停對以色列防衛協定：梅洛… · 教宗良十四世訪喀麥隆：呼籲結束十…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-17.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">17</div><div class="bdb-wd">FRI</div></div><div class="brief-text"><div class="brief-info-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div><div class="brief-info-sub">美參議院四度封殺伊朗戰爭權力法案… · 俄羅斯夜襲基輔：數百架無人機與數…</div></div><div class="brief-row-arrow">›</div></a>
+<a href="2026-04-16.html" class="brief-row"><div class="brief-date-block"><div class="bdb-day">16</div><div class="bdb-wd">THU</div></div><div class="brief-text"><div class="brief-info-title">📌 更新：美伊停火4月21日到期，多方緊急斡旋第二輪和談</div><div class="brief-info-sub">以色列與黎巴嫩34年來首次高層對… · 俄羅斯以逾660架無人機猛攻烏克…</div></div><div class="brief-row-arrow">›</div></a></div></div>
+
+</div>
+<footer class="site-footer">
+  <div class="sf-brand"><svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+      <defs><radialGradient id="lgi" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#f0d050"/><stop offset="100%" stop-color="#a06010"/></radialGradient></defs>
+      <circle cx="17" cy="17" r="17" fill="url(#lgi)"/>
+      <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+      <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+      <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+      <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+    </svg><div class="sf-name">Yuzu Brief</div></div>
+  <div class="sf-links"><a href="https://ianian22493.github.io/investment-dashboard/" target="_blank">Yuzu Finance →</a></div>
+</footer>
+
+<!-- Yuzu Finance FAB -->
+<a class="yuzu-fab" href="https://ianian22493.github.io/investment-dashboard/" target="_blank">
+  <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+  <div class="yuzu-fab-text">
+    <div class="yuzu-fab-name">Yuzu Finance</div>
+    <div class="yuzu-fab-sub">投資儀表板</div>
+  </div>
+  <div class="yuzu-fab-arr">›</div>
+</a>
+
+<script>
+  var activeMonth = null;
+  function toggleMonth(key) {
+    var card  = document.querySelector('.month-card[data-month="' + key + '"]');
+    var panel = document.getElementById('panel-' + key);
+    if (!card || !panel) return;
+    if (activeMonth && activeMonth !== key) {
+      var pc = document.querySelector('.month-card[data-month="' + activeMonth + '"]');
+      var pp = document.getElementById('panel-' + activeMonth);
+      if (pc) pc.classList.remove('active');
+      if (pp) pp.classList.remove('open');
     }
-  </script>
+    var isOpen = panel.classList.contains('open');
+    card.classList.toggle('active', !isOpen);
+    panel.classList.toggle('open', !isOpen);
+    activeMonth = isOpen ? null : key;
+    if (!isOpen) setTimeout(function() { panel.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50);
+  }
+</script>
 </body>
 </html>
