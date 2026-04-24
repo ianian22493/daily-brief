@@ -418,6 +418,20 @@ def build_brief_html(data, dt):
     .js-animate .fact-wrap {{ opacity:0; transform:translateY(16px); }}
     .reveal, .ni, .fact-wrap {{ transition:opacity .5s ease, transform .5s ease; }}
     .reveal.in, .ni.in, .fact-wrap.in {{ opacity:1 !important; transform:translateY(0) !important; }}
+
+    /* Yuzu Finance FAB */
+    .yuzu-fab {{ position:fixed; bottom:28px; right:28px; z-index:999; display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#c9a84c 0%,#f0d878 48%,#b8922e 100%); color:#1b2d4f; text-decoration:none; padding:12px 20px 12px 13px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }}
+    .yuzu-fab:hover {{ transform:translateY(-4px) scale(1.04); box-shadow:0 12px 40px rgba(184,146,46,.65),0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.35); animation:none; }}
+    .yuzu-fab-icon {{ flex-shrink:0; display:flex; align-items:center; }}
+    .yuzu-fab-text {{ display:flex; flex-direction:column; line-height:1; }}
+    .yuzu-fab-name {{ font-size:13px; font-weight:800; letter-spacing:.01em; }}
+    .yuzu-fab-sub  {{ font-size:9px; font-weight:600; opacity:.6; letter-spacing:.1em; text-transform:uppercase; margin-top:3px; }}
+    .yuzu-fab-arr  {{ font-size:15px; font-weight:300; opacity:.7; margin-left:2px; transition:transform .2s; }}
+    .yuzu-fab:hover .yuzu-fab-arr {{ transform:translateX(3px); opacity:1; }}
+    @keyframes fab-glow {{
+      0%,100% {{ box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }}
+      50%      {{ box-shadow:0 4px 32px rgba(184,146,46,.75),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }}
+    }}
   </style>
 </head>
 <body>
@@ -526,6 +540,16 @@ def build_brief_html(data, dt):
     <a href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a>
   </div>
 </footer>
+
+<!-- Yuzu Finance FAB -->
+<a class="yuzu-fab" href="{DASHBOARD_URL}" target="_blank">
+  <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+  <div class="yuzu-fab-text">
+    <div class="yuzu-fab-name">Yuzu Finance</div>
+    <div class="yuzu-fab-sub">投資儀表板</div>
+  </div>
+  <div class="yuzu-fab-arr">›</div>
+</a>
 
 <script>
 window.addEventListener('scroll', function() {{
@@ -812,6 +836,20 @@ def build_index_html(repo_dir):
     .sf-links a {{ font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }}
     .sf-links a:hover {{ color:var(--ink); }}
     .empty-hint {{ color:#bbb; font-size:13px; padding:16px 8px; }}
+
+    /* Yuzu Finance FAB */
+    .yuzu-fab {{ position:fixed; bottom:28px; right:28px; z-index:999; display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#c9a84c 0%,#f0d878 48%,#b8922e 100%); color:#1b2d4f; text-decoration:none; padding:12px 20px 12px 13px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }}
+    .yuzu-fab:hover {{ transform:translateY(-4px) scale(1.04); box-shadow:0 12px 40px rgba(184,146,46,.65),0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.35); animation:none; }}
+    .yuzu-fab-icon {{ flex-shrink:0; display:flex; align-items:center; }}
+    .yuzu-fab-text {{ display:flex; flex-direction:column; line-height:1; }}
+    .yuzu-fab-name {{ font-size:13px; font-weight:800; letter-spacing:.01em; }}
+    .yuzu-fab-sub  {{ font-size:9px; font-weight:600; opacity:.6; letter-spacing:.1em; text-transform:uppercase; margin-top:3px; }}
+    .yuzu-fab-arr  {{ font-size:15px; font-weight:300; opacity:.7; margin-left:2px; transition:transform .2s; }}
+    .yuzu-fab:hover .yuzu-fab-arr {{ transform:translateX(3px); opacity:1; }}
+    @keyframes fab-glow {{
+      0%,100% {{ box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }}
+      50%      {{ box-shadow:0 4px 32px rgba(184,146,46,.75),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }}
+    }}
   </style>
 </head>
 <body>
@@ -874,6 +912,17 @@ def build_index_html(repo_dir):
   <div class="sf-brand">{yuzu_logo_index}<div class="sf-name">Yuzu Brief</div></div>
   <div class="sf-links"><a href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a></div>
 </footer>
+
+<!-- Yuzu Finance FAB -->
+<a class="yuzu-fab" href="{DASHBOARD_URL}" target="_blank">
+  <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+  <div class="yuzu-fab-text">
+    <div class="yuzu-fab-name">Yuzu Finance</div>
+    <div class="yuzu-fab-sub">投資儀表板</div>
+  </div>
+  <div class="yuzu-fab-arr">›</div>
+</a>
+
 <script>
   var activeMonth = null;
   function toggleMonth(key) {{
