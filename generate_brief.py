@@ -48,6 +48,28 @@ SPECIAL_DATES = {
 # ════════════════════════════════════════════════════════════════════
 # Gemini — 搜尋並生成新聞內容
 # ════════════════════════════════════════════════════════════════════
+def get_recent_fact_titles(n=30):
+    """掃描目前目錄中最近 n 份簡報，收集已用過的冷知識標題（防止重複）"""
+    titles = []
+    try:
+        files = sorted(
+            [f for f in os.listdir('.') if re.match(r'^\d{4}-\d{2}-\d{2}\.html$', f)],
+            reverse=True
+        )[:n]
+        for fname in files:
+            try:
+                with open(fname, encoding='utf-8') as f:
+                    content = f.read()
+                m = re.search(r'class="fact-title">([^<]+)</div>', content)
+                if m:
+                    titles.append(m.group(1).strip())
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return titles
+
+
 def fetch_news(date_str, weekday_zh):
     """呼叫 Gemini（含 Google Search grounding）生成當日新聞 JSON"""
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -58,13 +80,24 @@ def fetch_news(date_str, weekday_zh):
     from google.genai import types
     client = genai.Client(api_key=api_key)
 
+    # 收集近期已用過的冷知識標題，要求 Gemini 避開相同或相似的主題
+    recent_facts = get_recent_fact_titles(30)
+    if recent_facts:
+        avoid_block = (
+            "\n\n⚠️ 冷知識注意事項（重要）：以下是近期已出現過的冷知識主題，"
+            "請選擇完全不同的主題，不得重複或使用相似的事實：\n"
+            + "\n".join(f"- {t}" for t in recent_facts)
+        )
+    else:
+        avoid_block = ""
+
     prompt = f"""今天是 {date_str}（星期{weekday_zh}）。
 
 你是繁體中文新聞編輯，請搜尋今天（{date_str}）最新的國際新聞，撰寫每日簡報。
 
 任務：
 1. 選出今天最重要的 5 則全球新聞（涵蓋政治、衝突、經濟、社會、科技，優先選有即時新聞的）
-2. 撰寫 1 則有趣的冷知識（科學、歷史、自然等皆可）
+2. 撰寫 1 則有趣的冷知識（科學、歷史、自然等皆可）{avoid_block}
 
 新聞格式要求：
 - 標題：15–30 字，精確描述事件核心，主詞清楚
