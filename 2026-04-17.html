@@ -3,68 +3,352 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>每日簡報｜2026年4月17日</title>
+  <title>Yuzu Brief — 2026年4月17日</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #f0ede8; font-family: -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif; color: #1a1a1a; min-height: 100vh; padding: 32px 16px 64px; }
-    .container { max-width: 680px; margin: 0 auto; }
-    .header { background: #1b2d4f; border-radius: 16px 16px 0 0; padding: 34px 40px 28px; position: relative; overflow: hidden; }
-    .header::before { content:''; position:absolute; top:-60px; right:-60px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.04); pointer-events:none; }
-    .animal-badge { position:absolute; top:22px; right:26px; width:82px; height:82px; background:rgba(255,255,255,0.09); border:1.5px solid rgba(255,255,255,0.14); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:50px; line-height:1; }
-    .header-text { padding-right: 100px; }
-    .date-main { font-size:28px; font-weight:700; color:#fff; line-height:1.2; letter-spacing:-0.01em; white-space:nowrap; }
-    .weekday-row { margin-top:10px; }
-    .weekday-badge { display:inline-block; background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:3px 13px; font-size:13px; font-weight:600; color:rgba(255,255,255,0.72); letter-spacing:0.05em; }
-    .header-divider { height:1px; background:rgba(255,255,255,0.1); margin:16px 0 12px; }
-    .header-tagline { font-size:13px; color:rgba(255,255,255,0.36); letter-spacing:0.04em; }
-    .body-card { background:#fff; border-radius:0 0 16px 16px; padding:36px 40px 40px; box-shadow:0 8px 40px rgba(0,0,0,0.08); }
-    .section { margin-bottom:40px; }
-    .section:last-child { margin-bottom:0; }
-    .section-header { display:flex; align-items:center; gap:10px; margin-bottom:22px; padding-bottom:14px; border-bottom:1.5px solid #f0ede8; }
-    .section-icon { font-size:18px; line-height:1; }
-    .section-title { font-size:13px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:#888; }
-    .news-item { display:flex; gap:18px; padding:18px 0; border-bottom:1px solid #f5f3f0; }
-    .news-item:last-child { border-bottom:none; padding-bottom:0; }
-    .news-item:first-child { padding-top:0; }
-    .news-number { flex-shrink:0; width:28px; height:28px; background:#1b2d4f; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; margin-top:2px; }
-    .news-content { flex:1; }
-    .news-title { font-size:15px; font-weight:700; line-height:1.4; color:#111; margin-bottom:7px; }
-    .news-body { font-size:14px; line-height:1.75; color:#444; }
-    .fact-card { background:linear-gradient(135deg,#fffbf0 0%,#fff8e1 100%); border:1.5px solid #ffe082; border-radius:12px; padding:22px 24px; position:relative; overflow:hidden; }
-    .fact-card::before { content:'💡'; position:absolute; right:20px; top:16px; font-size:28px; opacity:0.3; }
-    .fact-title { font-size:14px; font-weight:700; color:#7a5c00; margin-bottom:8px; }
-    .fact-body { font-size:14px; line-height:1.75; color:#5a4200; }
-    .footer { text-align:center; margin-top:28px; font-size:12px; color:#bbb; letter-spacing:0.05em; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg:    #f3efe7;
+      --bg2:   #ebe6db;
+      --navy:  #1b2d4f;
+      --navy2: #0f1d34;
+      --ink:   #0f172a;
+      --ink2:  #374151;
+      --ink3:  #9ca3af;
+      --border:#ddd7c8;
+      --gold:  #b8922e;
+      --gold-l:#e8c84a;
+      --gold-bg:#fdf8ec;
+      --gold-b:#e8cf85;
+    }
+    body { background:var(--bg); color:var(--ink); font-family:'DM Sans','Noto Sans TC',sans-serif; min-height:100vh; }
+
+    /* Reading bar */
+    #rbar { position:fixed; top:0; left:0; z-index:400; height:3px; width:0%; background:linear-gradient(90deg,var(--navy) 0%,#4d9cf8 100%); transition:width .08s linear; }
+
+    /* Top nav */
+    .topnav { position:sticky; top:0; z-index:300; height:52px; padding:0 28px; background:rgba(243,239,231,.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .tn-brand { display:flex; align-items:center; gap:11px; text-decoration:none; }
+    .tn-name { font-size:14px; font-weight:700; color:var(--ink); }
+    .tn-sub { font-size:9px; color:var(--ink3); letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }
+    .tn-links { display:flex; gap:22px; }
+    .tn-link { font-size:12px; color:var(--ink3); text-decoration:none; letter-spacing:.04em; transition:color .15s; }
+    .tn-link:hover, .tn-link.cur { color:var(--ink); }
+
+    /* Hero */
+    .hero { background:var(--navy2); position:relative; overflow:hidden; }
+    .hero-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .hero-bg svg { position:absolute; inset:0; width:100%; height:100%; opacity:.06; }
+    .hero-inner { max-width:800px; margin:0 auto; padding:52px 32px 0; position:relative; z-index:1; }
+    .hero-layout { display:grid; grid-template-columns:1fr auto; gap:24px; align-items:flex-start; }
+    .hero-eyebrow { font-size:10px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+    .hero-eyebrow::before { content:''; width:18px; height:1px; background:rgba(255,255,255,.2); display:inline-block; }
+    .hero-date { font-family:'Playfair Display','Noto Serif TC',serif; font-weight:900; color:#fff; line-height:1.0; }
+    .hero-date .yr { display:block; font-size:clamp(14px,2vw,18px); font-weight:400; font-style:italic; color:rgba(255,255,255,.38); margin-bottom:4px; }
+    .hero-date .md { display:block; font-size:clamp(32px,6vw,56px); letter-spacing:-.03em; }
+    .hero-weekday { margin-top:20px; display:inline-flex; align-items:center; gap:10px; }
+    .hero-badge { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:5px 18px; font-size:12px; color:rgba(255,255,255,.6); font-weight:500; }
+    .hero-slogan { font-size:12px; color:rgba(255,255,255,.55); letter-spacing:.05em; }
+    .hero-animal { width:110px; height:110px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:62px; line-height:1; flex-shrink:0; margin-top:4px; }
+    @media(max-width:420px){ .hero-animal { display:none; } }
+    .hero-rule { margin-top:36px; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5) 0%,rgba(201,168,76,.0) 60%); }
+    .hero-sections { display:flex; gap:0; padding:13px 0; }
+    .hs-item { font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); padding-right:22px; margin-right:22px; border-right:1px solid rgba(255,255,255,.15); display:flex; align-items:center; gap:6px; }
+    .hs-item:last-child { border-right:none; }
+    .hs-item.hi { color:rgba(255,255,255,.9); }
+
+    /* Body */
+    .body-wrap { max-width:800px; margin:0 auto; padding:0 32px 80px; }
+    .a-sec { padding:52px 0; border-bottom:1px solid var(--border); }
+    .a-sec:last-child { border-bottom:none; }
+    .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:40px; }
+    .sec-icon { font-size:20px; }
+    .sec-label { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#374151; white-space:nowrap; }
+    .sec-rule { flex:1; height:1px; background:var(--border); }
+
+    /* News */
+    .news-list { display:flex; flex-direction:column; gap:0; }
+    .ni { --ac:#1b2d4f; display:grid; grid-template-columns:56px 1fr; padding:36px 0; border-bottom:1px solid var(--border); transition:opacity .5s ease, transform .5s ease; }
+    .ni:first-child { padding-top:0; }
+    .ni:last-child { border-bottom:none; padding-bottom:0; }
+    .ni:hover .ni-title { color:var(--ac); }
+    .ni:hover .ni-num { opacity:.45; }
+    .ni-num { font-family:'Playfair Display',serif; font-size:48px; font-weight:900; line-height:1; color:var(--ac); opacity:.18; letter-spacing:-.03em; transition:opacity .2s; padding-top:2px; }
+    .ni-title { font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(17px,2.5vw,20px); font-weight:700; line-height:1.4; color:var(--ink); margin-bottom:13px; text-wrap:pretty; transition:color .2s ease; }
+    .ni-text { font-size:14px; line-height:1.95; color:var(--ink2); text-wrap:pretty; }
+    .ni-lead { display:block; padding-left:14px; border-left:2.5px solid var(--ac); font-size:14px; font-weight:500; line-height:1.8; color:var(--ink2); margin-bottom:12px; }
+
+    /* Fact */
+    .fact-wrap { background:var(--navy); border-radius:20px; overflow:hidden; position:relative; }
+    .fact-wrap::before { content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 65%); pointer-events:none; }
+    .fact-inner { display:grid; grid-template-columns:6px 1fr; }
+    .fact-stripe { background:linear-gradient(180deg,var(--gold-l),rgba(184,146,46,.2)); }
+    .fact-content { padding:34px 36px; }
+    .fact-kicker { font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-l); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .fact-kicker::before { content:''; display:inline-block; width:18px; height:1px; background:var(--gold); }
+    .fact-title { font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(22px,3vw,28px); font-weight:700; color:#fff; margin-bottom:18px; line-height:1.3; }
+    .fact-body { font-size:15px; line-height:2; color:rgba(255,255,255,.78); }
+    .fact-animal { position:absolute; right:28px; bottom:24px; font-size:48px; opacity:.1; line-height:1; }
+
+    /* Special banner */
+    .special-banner { display:flex; align-items:center; gap:16px; border-radius:14px; padding:18px 24px; margin-bottom:0; }
+    .special-banner--today { background:linear-gradient(135deg,#ff6b9d 0%,#ff8c42 100%); box-shadow:0 4px 20px rgba(255,107,157,0.35); }
+    .special-banner--tomorrow { background:linear-gradient(135deg,#fffbea 0%,#fff0c0 100%); border:1.5px solid #ffd54f; }
+    .banner-emoji { font-size:40px; line-height:1; flex-shrink:0; }
+    .banner-title { font-size:17px; font-weight:800; line-height:1.3; }
+    .banner-sub { font-size:13px; margin-top:4px; }
+    .special-banner--today .banner-title { color:#fff; }
+    .special-banner--today .banner-sub { color:rgba(255,255,255,.85); }
+    .special-banner--tomorrow .banner-title { color:#7a4e00; }
+    .special-banner--tomorrow .banner-sub { color:#a06500; }
+
+    /* Footer */
+    .site-footer { max-width:800px; margin:0 auto; padding:24px 32px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+    .sf-brand { display:flex; align-items:center; gap:10px; }
+    .sf-name { font-size:12px; font-weight:600; color:var(--ink3); }
+    .sf-date { font-size:11px; color:var(--ink3); margin-top:1px; }
+    .sf-links { display:flex; gap:20px; }
+    .sf-links a { font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }
+    .sf-links a:hover { color:var(--ink); }
+
+    /* Animations */
+    .js-animate .reveal { opacity:0; transform:translateY(16px); }
+    .js-animate .ni { opacity:0; transform:translateY(16px); }
+    .js-animate .fact-wrap { opacity:0; transform:translateY(16px); }
+    .reveal, .ni, .fact-wrap { transition:opacity .5s ease, transform .5s ease; }
+    .reveal.in, .ni.in, .fact-wrap.in { opacity:1 !important; transform:translateY(0) !important; }
+
+    /* Yuzu Finance FAB */
+    .yuzu-fab { position:fixed; bottom:28px; right:28px; z-index:999; display:flex; align-items:center; gap:10px; background:linear-gradient(135deg,#c9a84c 0%,#f0d878 48%,#b8922e 100%); color:#1b2d4f; text-decoration:none; padding:12px 20px 12px 13px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }
+    .yuzu-fab:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 12px 40px rgba(184,146,46,.65),0 2px 8px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.35); animation:none; }
+    .yuzu-fab-icon { flex-shrink:0; display:flex; align-items:center; }
+    .yuzu-fab-text { display:flex; flex-direction:column; line-height:1; }
+    .yuzu-fab-name { font-size:13px; font-weight:800; letter-spacing:.01em; }
+    .yuzu-fab-sub  { font-size:9px; font-weight:600; opacity:.6; letter-spacing:.1em; text-transform:uppercase; margin-top:3px; }
+    .yuzu-fab-arr  { font-size:15px; font-weight:300; opacity:.7; margin-left:2px; transition:transform .2s; }
+    .yuzu-fab:hover .yuzu-fab-arr { transform:translateX(3px); opacity:1; }
+    @keyframes fab-glow {
+      0%,100% { box-shadow:0 4px 20px rgba(184,146,46,.45),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }
+      50%      { box-shadow:0 4px 32px rgba(184,146,46,.75),0 1px 4px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.35); }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="animal-badge">🦥</div>
-      <div class="header-text">
-        <div class="date-main">2026年4月17日</div>
-        <div class="weekday-row"><span class="weekday-badge">星期五</span></div>
-        <div class="header-divider"></div>
-        <div class="header-tagline">用五分鐘，掌握今天的世界</div>
-      </div>
+
+<div id="rbar"></div>
+
+
+
+<!-- Nav -->
+<nav class="topnav">
+  <a class="tn-brand" href="index.html">
+    <svg width="36" height="36" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lg1" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg1)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+</svg>
+    <div>
+      <div class="tn-name">Yuzu Brief</div>
+      <div class="tn-sub">Daily News</div>
     </div>
-    <div class="body-card">
-      <div class="section">
-        <div class="section-header"><span class="section-icon">🌍</span><span class="section-title">全球五大新聞</span></div>
-        <div class="news-item"><div class="news-number">1</div><div class="news-content"><div class="news-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div><div class="news-body">4月15日，土耳其南部Kahramanmaraş省一名14歲男學生İsa Aras Mersinli背著5把槍與7個彈匣闖入自己就讀的中學，朝兩間教室掃射，造成8名學生與1名數學老師Ayla Kara身亡、13人受傷。此為土耳其史上最嚴重的校園槍擊，距離前一天Şanlıurfa省另一起校園槍擊僅相隔28小時。槍枝取自其曾任警察的父親，並在社群檔案上引用了2014年美國加州大規模槍手Elliot Rodger。土耳其教師工會宣布4月15至17日全國罷課三天，抗議校園暴力失控。</div></div></div>
-        <div class="news-item"><div class="news-number">2</div><div class="news-content"><div class="news-title">美參議院四度封殺伊朗戰爭權力法案：47比52票維持川普開戰權</div><div class="news-body">4月15日，美國參議院以47比52票再次否決民主黨提出的《戰爭權力決議》，無法強制總統川普停止對伊朗的軍事行動。共和黨僅肯塔基州的Rand Paul跨黨派支持，民主黨的Fetterman反向倒戈。這是今年以來參院第四度駁回相關決議。自2月底美以對伊朗開戰以來，戰事已造成逾1,700名平民死亡，並引發全球燃料危機；民主黨強調國會不能持續缺席此一重大戰爭決策。</div></div></div>
-        <div class="news-item"><div class="news-number">3</div><div class="news-content"><div class="news-title">俄羅斯夜襲基輔：數百架無人機與數十枚飛彈，烏克蘭16死</div><div class="news-body">俄軍於本週對烏克蘭首都基輔及多個主要城市發動大規模空襲，動用數百架無人機與數十枚彈道／巡弋飛彈，攻擊持續數小時，至少造成16名平民死亡。川普政府同步與通用汽車、福特等車廠高層會談，希望美國民間製造商擴大參與軍工生產，以補充因烏克蘭與伊朗兩場戰爭而快速消耗的武器彈藥庫存。</div></div></div>
-        <div class="news-item"><div class="news-number">4</div><div class="news-content"><div class="news-title">📌 更新 荷莫茲封鎖外溢：航空燃油短缺警報、油商單月進帳逾300億美元</div><div class="news-body">美軍對伊朗港口的海上封鎖延續至第二週，美伊停火期可能於4月22日後再延長兩週以爭取外交空間。封鎖引發全球民航混亂：多家航空公司取消或縮減航班，歐洲機場協會警告若荷莫茲海峽交通本月底前無法正常化，恐爆發「系統性航空燃油短缺」。另據統計，全球前百大油氣公司在戰爭第一個月內共賺進逾300億美元的戰爭暴利，沙烏地Aramco、俄氣（Gazprom）與ExxonMobil為最大贏家。</div></div></div>
-        <div class="news-item"><div class="news-number">5</div><div class="news-content"><div class="news-title">IUCN紅皮書最新更新：帝王企鵝、南極毛皮海豹正式列為「瀕危」</div><div class="news-body">世界自然保育聯盟（IUCN）於4月9日更新紅皮書，帝王企鵝自「近危」升級為「瀕危」，南極毛皮海豹則從「無危」一口氣躍為「瀕危」。衛星數據顯示，帝王企鵝2009至2018年間族群已減少約10%（逾2萬隻成鳥），因南極海冰提前融化，近半數已知繁殖地出現繁殖失敗，科學家預估至2080年代族群恐再腰斬。南極毛皮海豹則從1999年的約219萬頭降至2025年的94萬頭，凸顯南冰洋暖化衝擊全面加劇。</div></div></div>
+  </a>
+  <div class="tn-links">
+    <a class="tn-link" href="https://ianian22493.github.io/investment-dashboard/" target="_blank">Yuzu Finance</a>
+    <a class="tn-link cur" href="#">Yuzu Brief</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-bg">
+    <svg viewBox="0 0 800 380" preserveAspectRatio="xMidYMid slice" fill="none">
+      <circle cx="700" cy="50" r="200" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="130" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="60"  stroke="white" stroke-width="1"/>
+      <circle cx="100" cy="320" r="150" stroke="white" stroke-width=".7"/>
+      <line x1="700" y1="50" x2="540" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="860" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="700" y2="230" stroke="white" stroke-width=".6"/>
+    </svg>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-layout">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Yuzu Brief · Daily News</div>
+        <div class="hero-date">
+          <span class="yr">2026年</span>
+          <span class="md">4月17日</span>
+        </div>
+        <div class="hero-weekday">
+          <span class="hero-badge">星期五</span>
+          <span class="hero-slogan">用五分鐘，掌握今天的世界</span>
+        </div>
       </div>
-      <div class="section">
-        <div class="section-header"><span class="section-icon">🧠</span><span class="section-title">每日冷知識</span></div>
-        <div class="fact-card"><div class="fact-title">樹懶憋氣時間是海豚的四倍？</div><div class="fact-body">看似懶洋洋的樹懶其實是憋氣高手——牠們能降低心跳率，在水下憋氣長達40分鐘，是海豚的整整四倍。樹懶在亞馬遜河流域常需游泳通過洪水區，這項本領對牠們的生存至關重要。下次覺得自己行動太慢時，可以提醒自己：慢，有時也是一種超能力。</div></div>
-      </div>
+      <div class="hero-animal">🦥</div>
     </div>
-    <div class="footer">
-      <a href="index.html" style="color:#bbb;text-decoration:none;">← 返回所有簡報</a> &nbsp;·&nbsp; 柚子 Daily Brief &nbsp;·&nbsp; 2026-04-17
+    <div class="hero-rule"></div>
+    <div class="hero-sections">
+      <div class="hs-item hi"><span>🌍</span> 全球五大新聞</div>
+      <div class="hs-item" style="color:rgba(255,255,255,.75)"><span>🧠</span> 每日冷知識</div>
     </div>
   </div>
+</div>
+
+<!-- Body -->
+<div class="body-wrap">
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🌍</span>
+      <span class="sec-label">全球五大新聞</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="news-list">
+
+      <div class="ni" style="--ac:#1b2d4f">
+        <div class="ni-n"><div class="ni-num">1</div></div>
+        <div class="ni-body">
+          <div class="ni-title">土耳其校園血案：14歲學生兩天內第二起校園槍擊，9死13傷</div>
+          <div class="ni-text">4月15日，土耳其南部Kahramanmaraş省一名14歲男學生İsa Aras Mersinli背著5把槍與7個彈匣闖入自己就讀的中學，朝兩間教室掃射，造成8名學生與1名數學老師Ayla Kara身亡、13人受傷。此為土耳其史上最嚴重的校園槍擊，距離前一天Şanlıurfa省另一起校園槍擊僅相隔28小時。槍枝取自其曾任警察的父親，並在社群檔案上引用了2014年美國加州大規模槍手Elliot Rodger。土耳其教師工會宣布4月15至17日全國罷課三天，抗議校園暴力失控。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#2563eb">
+        <div class="ni-n"><div class="ni-num">2</div></div>
+        <div class="ni-body">
+          <div class="ni-title">美參議院四度封殺伊朗戰爭權力法案：47比52票維持川普開戰權</div>
+          <div class="ni-text">4月15日，美國參議院以47比52票再次否決民主黨提出的《戰爭權力決議》，無法強制總統川普停止對伊朗的軍事行動。共和黨僅肯塔基州的Rand Paul跨黨派支持，民主黨的Fetterman反向倒戈。這是今年以來參院第四度駁回相關決議。自2月底美以對伊朗開戰以來，戰事已造成逾1,700名平民死亡，並引發全球燃料危機；民主黨強調國會不能持續缺席此一重大戰爭決策。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#0891b2">
+        <div class="ni-n"><div class="ni-num">3</div></div>
+        <div class="ni-body">
+          <div class="ni-title">俄羅斯夜襲基輔：數百架無人機與數十枚飛彈，烏克蘭16死</div>
+          <div class="ni-text">俄軍於本週對烏克蘭首都基輔及多個主要城市發動大規模空襲，動用數百架無人機與數十枚彈道／巡弋飛彈，攻擊持續數小時，至少造成16名平民死亡。川普政府同步與通用汽車、福特等車廠高層會談，希望美國民間製造商擴大參與軍工生產，以補充因烏克蘭與伊朗兩場戰爭而快速消耗的武器彈藥庫存。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#7c3aed">
+        <div class="ni-n"><div class="ni-num">4</div></div>
+        <div class="ni-body">
+          <div class="ni-title">📌 更新 荷莫茲封鎖外溢：航空燃油短缺警報、油商單月進帳逾300億美元</div>
+          <div class="ni-text">美軍對伊朗港口的海上封鎖延續至第二週，美伊停火期可能於4月22日後再延長兩週以爭取外交空間。封鎖引發全球民航混亂：多家航空公司取消或縮減航班，歐洲機場協會警告若荷莫茲海峽交通本月底前無法正常化，恐爆發「系統性航空燃油短缺」。另據統計，全球前百大油氣公司在戰爭第一個月內共賺進逾300億美元的戰爭暴利，沙烏地Aramco、俄氣（Gazprom）與ExxonMobil為最大贏家。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#b45309">
+        <div class="ni-n"><div class="ni-num">5</div></div>
+        <div class="ni-body">
+          <div class="ni-title">IUCN紅皮書最新更新：帝王企鵝、南極毛皮海豹正式列為「瀕危」</div>
+          <div class="ni-text">世界自然保育聯盟（IUCN）於4月9日更新紅皮書，帝王企鵝自「近危」升級為「瀕危」，南極毛皮海豹則從「無危」一口氣躍為「瀕危」。衛星數據顯示，帝王企鵝2009至2018年間族群已減少約10%（逾2萬隻成鳥），因南極海冰提前融化，近半數已知繁殖地出現繁殖失敗，科學家預估至2080年代族群恐再腰斬。南極毛皮海豹則從1999年的約219萬頭降至2025年的94萬頭，凸顯南冰洋暖化衝擊全面加劇。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🧠</span>
+      <span class="sec-label">每日冷知識</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="fact-wrap">
+      <div class="fact-inner">
+        <div class="fact-stripe"></div>
+        <div class="fact-content">
+          <div class="fact-kicker">Today's Fun Fact</div>
+          <div class="fact-title">樹懶憋氣時間是海豚的四倍？</div>
+          <div class="fact-body">看似懶洋洋的樹懶其實是憋氣高手——牠們能降低心跳率，在水下憋氣長達40分鐘，是海豚的整整四倍。樹懶在亞馬遜河流域常需游泳通過洪水區，這項本領對牠們的生存至關重要。下次覺得自己行動太慢時，可以提醒自己：慢，有時也是一種超能力。</div>
+        </div>
+      </div>
+      <div class="fact-animal">🦥</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="sf-brand">
+    <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+  <defs>
+    <radialGradient id="lg2" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg2)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8"  fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"   stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
+    <div>
+      <div class="sf-name">Yuzu Brief · Daily News</div>
+      <div class="sf-date">2026-04-17</div>
+    </div>
+  </div>
+  <div class="sf-links">
+    <a href="index.html">← 所有簡報</a>
+    <a href="https://ianian22493.github.io/investment-dashboard/" target="_blank">Yuzu Finance →</a>
+  </div>
+</footer>
+
+<!-- Yuzu Finance FAB -->
+<a class="yuzu-fab" href="https://ianian22493.github.io/investment-dashboard/" target="_blank">
+  <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+  <div class="yuzu-fab-text">
+    <div class="yuzu-fab-name">Yuzu Finance</div>
+    <div class="yuzu-fab-sub">投資儀表板</div>
+  </div>
+  <div class="yuzu-fab-arr">›</div>
+</a>
+
+<script>
+window.addEventListener('scroll', function() {
+  var d = document.documentElement;
+  document.getElementById('rbar').style.width =
+    Math.min((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100, 100) + '%';
+});
+
+document.body.classList.add('js-animate');
+
+var secObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('in'); secObs.unobserve(e.target); } });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(function(el) { secObs.observe(el); });
+
+var listObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.ni').forEach(function(item, i) {
+      setTimeout(function() { item.classList.add('in'); }, i * 100);
+    });
+    e.target.querySelectorAll('.fact-wrap').forEach(function(c) {
+      setTimeout(function() { c.classList.add('in'); }, 150);
+    });
+    listObs.unobserve(e.target);
+  });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.a-sec').forEach(function(el) { listObs.observe(el); });
+
+setTimeout(function() {
+  document.querySelectorAll('.reveal:not(.in)').forEach(function(el) { el.classList.add('in'); });
+  document.querySelectorAll('.ni:not(.in)').forEach(function(el, i) {
+    setTimeout(function() { el.classList.add('in'); }, i * 60);
+  });
+  document.querySelectorAll('.fact-wrap:not(.in)').forEach(function(el) { el.classList.add('in'); });
+}, 900);
+</script>
 </body>
 </html>
