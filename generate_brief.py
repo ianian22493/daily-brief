@@ -351,7 +351,7 @@ def build_brief_html(data, dt):
     .hero-badge {{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:5px 18px; font-size:12px; color:rgba(255,255,255,.6); font-weight:500; }}
     .hero-slogan {{ font-size:12px; color:rgba(255,255,255,.55); letter-spacing:.05em; }}
     .hero-animal {{ width:110px; height:110px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:62px; line-height:1; flex-shrink:0; margin-top:4px; }}
-    @media(max-width:420px){{ .hero-animal {{ display:none; }} }}
+    @media(max-width:420px){{ .hero-animal {{ width:72px; height:72px; font-size:40px; }} }}
     .hero-rule {{ margin-top:36px; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5) 0%,rgba(201,168,76,.0) 60%); }}
     .hero-sections {{ display:flex; gap:0; padding:13px 0; }}
     .hs-item {{ font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); padding-right:22px; margin-right:22px; border-right:1px solid rgba(255,255,255,.15); display:flex; align-items:center; gap:6px; }}
