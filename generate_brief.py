@@ -931,15 +931,25 @@ def build_index_html(repo_dir):
   <div class="sf-links"><a href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a></div>
 </footer>
 
-<!-- Yuzu Finance FAB -->
-<a class="yuzu-fab" href="{DASHBOARD_URL}" target="_blank">
-  <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-  <div class="yuzu-fab-text">
-    <div class="yuzu-fab-name">Yuzu Finance</div>
-    <div class="yuzu-fab-sub">投資儀表板</div>
-  </div>
-  <div class="yuzu-fab-arr">›</div>
-</a>
+<!-- FAB dock -->
+<div class="fab-dock">
+  <a class="yuzu-fab-cam" href="{PHOTOSHOP_URL}" target="_blank">
+    <div class="yuzu-fab-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+    <div class="yuzu-fab-text">
+      <div class="yuzu-fab-name">Yuzu Photoshop</div>
+      <div class="yuzu-fab-sub">圖片風格工具</div>
+    </div>
+    <div class="yuzu-fab-arr">›</div>
+  </a>
+  <a class="yuzu-fab" href="{DASHBOARD_URL}" target="_blank">
+    <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div class="yuzu-fab-text">
+      <div class="yuzu-fab-name">Yuzu Finance</div>
+      <div class="yuzu-fab-sub">投資儀表板</div>
+    </div>
+    <div class="yuzu-fab-arr">›</div>
+  </a>
+</div>
 
 <script>
   var activeMonth = null;
