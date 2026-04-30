@@ -310,14 +310,14 @@ def build_brief_html(data, dt):
   <style>
     *, *::before, *::after {{ margin:0; padding:0; box-sizing:border-box; }}
     :root {{
-      --bg:    #f3efe7;
-      --bg2:   #ebe6db;
+      --bg:    #F7F6F2;
+      --bg2:   #EDEBE4;
       --navy:  #1b2d4f;
       --navy2: #0f1d34;
-      --ink:   #0f172a;
-      --ink2:  #374151;
+      --ink:   #1a1a1a;
+      --ink2:  #555555;
       --ink3:  #9ca3af;
-      --border:#ddd7c8;
+      --border:#E8E4DC;
       --gold:  #b8922e;
       --gold-l:#e8c84a;
       --gold-bg:#fdf8ec;
@@ -341,7 +341,7 @@ def build_brief_html(data, dt):
     .hero {{ background:var(--navy2); position:relative; overflow:hidden; }}
     .hero-bg {{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }}
     .hero-bg svg {{ position:absolute; inset:0; width:100%; height:100%; opacity:.06; }}
-    .hero-inner {{ max-width:800px; margin:0 auto; padding:52px 32px 0; position:relative; z-index:1; }}
+    .hero-inner {{ max-width:720px; margin:0 auto; padding:52px 32px 0; position:relative; z-index:1; }}
     .hero-layout {{ display:flex; flex-direction:row; justify-content:space-between; align-items:flex-start; gap:16px; }}
     .hero-left {{ flex:1; min-width:0; }}
     .hero-eyebrow {{ font-size:10px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:18px; display:flex; align-items:center; gap:12px; }}
@@ -353,7 +353,7 @@ def build_brief_html(data, dt):
     .hero-badge {{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:5px 18px; font-size:12px; color:rgba(255,255,255,.6); font-weight:500; white-space:nowrap; }}
     .hero-slogan {{ font-size:12px; color:rgba(255,255,255,.55); letter-spacing:.05em; }}
     .hero-animal {{ width:88px; height:88px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:48px; line-height:1; flex-shrink:0; margin-top:4px; }}
-    @media(max-width:640px){{ .hero-inner {{ padding:40px 20px 0; }} .hero-animal {{ width:68px; height:68px; font-size:38px; }} .hero-slogan {{ display:none; }} }}
+    @media(max-width:640px){{ .hero-inner {{ padding:40px 20px 0; }} .hero-animal {{ width:68px; height:68px; font-size:38px; }} .hero-slogan {{ display:none; }} .body-wrap {{ padding:0 16px 64px; }} }}
     .hero-rule {{ margin-top:36px; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5) 0%,rgba(201,168,76,.0) 60%); }}
     .hero-sections {{ display:flex; gap:0; padding:13px 0; }}
     .hs-item {{ font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); padding-right:22px; margin-right:22px; border-right:1px solid rgba(255,255,255,.15); display:flex; align-items:center; gap:6px; }}
@@ -361,25 +361,25 @@ def build_brief_html(data, dt):
     .hs-item.hi {{ color:rgba(255,255,255,.9); }}
 
     /* Body */
-    .body-wrap {{ max-width:800px; margin:0 auto; padding:0 32px 80px; }}
-    .a-sec {{ padding:52px 0; border-bottom:1px solid var(--border); }}
+    .body-wrap {{ max-width:720px; margin:0 auto; padding:0 24px 80px; }}
+    .a-sec {{ padding:44px 0; border-bottom:1px solid var(--border); }}
     .a-sec:last-child {{ border-bottom:none; }}
-    .sec-head {{ display:flex; align-items:center; gap:14px; margin-bottom:40px; }}
+    .sec-head {{ display:flex; align-items:center; gap:14px; margin-bottom:28px; }}
     .sec-icon {{ font-size:20px; }}
-    .sec-label {{ font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#374151; white-space:nowrap; }}
+    .sec-label {{ font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); white-space:nowrap; }}
     .sec-rule {{ flex:1; height:1px; background:var(--border); }}
+    hr {{ border:none; border-top:1px solid #EAEAEA; margin:32px 0; }}
 
     /* News */
-    .news-list {{ display:flex; flex-direction:column; gap:0; }}
-    .ni {{ --ac:#1b2d4f; display:grid; grid-template-columns:56px 1fr; padding:36px 0; border-bottom:1px solid var(--border); transition:opacity .5s ease, transform .5s ease; }}
-    .ni:first-child {{ padding-top:0; }}
-    .ni:last-child {{ border-bottom:none; padding-bottom:0; }}
+    .news-list {{ display:flex; flex-direction:column; gap:14px; }}
+    .ni {{ --ac:#1b2d4f; display:grid; grid-template-columns:52px 1fr; padding:22px 20px 22px 16px; background:#ffffff; border-radius:14px; border:1px solid #EDEAE4; box-shadow:0 2px 8px rgba(0,0,0,.04); transition:opacity .5s ease, transform .3s ease, box-shadow .3s ease; }}
+    .ni:hover {{ transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.07); }}
     .ni:hover .ni-title {{ color:var(--ac); }}
-    .ni:hover .ni-num {{ opacity:.45; }}
-    .ni-num {{ font-family:'Playfair Display',serif; font-size:48px; font-weight:900; line-height:1; color:var(--ac); opacity:.18; letter-spacing:-.03em; transition:opacity .2s; padding-top:2px; }}
-    .ni-title {{ font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(17px,2.5vw,20px); font-weight:700; line-height:1.4; color:var(--ink); margin-bottom:13px; text-wrap:pretty; transition:color .2s ease; }}
-    .ni-text {{ font-size:14px; line-height:1.95; color:var(--ink2); text-wrap:pretty; }}
-    .ni-lead {{ display:block; padding-left:14px; border-left:2.5px solid var(--ac); font-size:14px; font-weight:500; line-height:1.8; color:var(--ink2); margin-bottom:12px; }}
+    .ni:hover .ni-num {{ opacity:.38; }}
+    .ni-num {{ font-family:'Playfair Display',serif; font-size:44px; font-weight:900; line-height:1; color:var(--ac); opacity:.14; letter-spacing:-.03em; transition:opacity .2s; padding-top:4px; text-align:center; }}
+    .ni-title {{ font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(17px,2.5vw,19px); font-weight:700; line-height:1.45; color:var(--ink); margin-bottom:12px; text-wrap:pretty; transition:color .2s ease; border-left:3px solid #D0CBBD; padding-left:10px; }}
+    .ni-text {{ font-size:15px; line-height:1.85; color:var(--ink2); text-wrap:pretty; padding-left:13px; }}
+    .ni-lead {{ display:block; padding-left:14px; border-left:2.5px solid var(--ac); font-size:15px; font-weight:500; line-height:1.8; color:var(--ink2); margin-bottom:12px; }}
 
     /* Fact */
     .fact-wrap {{ background:var(--navy); border-radius:20px; overflow:hidden; position:relative; }}
@@ -406,7 +406,7 @@ def build_brief_html(data, dt):
     .special-banner--tomorrow .banner-sub {{ color:#a06500; }}
 
     /* Footer */
-    .site-footer {{ max-width:800px; margin:0 auto; padding:24px 32px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }}
+    .site-footer {{ max-width:720px; margin:0 auto; padding:24px 24px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }}
     .sf-brand {{ display:flex; align-items:center; gap:10px; }}
     .sf-name {{ font-size:12px; font-weight:600; color:var(--ink3); }}
     .sf-date {{ font-size:11px; color:var(--ink3); margin-top:1px; }}
