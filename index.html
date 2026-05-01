@@ -82,8 +82,8 @@
     .month-card-year   { font-size:10px; color:rgba(255,255,255,.38); letter-spacing:.08em; }
     .month-card-name   { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:#fff; margin:4px 0 3px; }
     .month-card-count  { font-size:11px; color:rgba(255,255,255,.38); }
-    .month-panel { display:none; border-radius:14px; overflow:hidden; margin-top:10px; border:1px solid var(--border); background:#fff; }
-    .month-panel.open { display:block; }
+    .month-panel { border-radius:14px; overflow:hidden; border:1px solid var(--border); background:#fff; max-height:0; margin-top:0; opacity:0; transform:translateY(-10px); transition:max-height .42s cubic-bezier(.4,0,.2,1), margin-top .42s cubic-bezier(.4,0,.2,1), opacity .24s ease, transform .24s ease; }
+    .month-panel.open { opacity:1; transform:translateY(0); margin-top:10px; }
     .mp-head { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--navy); }
     .mp-title { font-size:14px; font-weight:700; color:#fff; }
     .mp-close { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15); border-radius:20px; cursor:pointer; font-size:11px; color:rgba(255,255,255,.6); padding:4px 12px; transition:background .12s; }
@@ -261,13 +261,20 @@
       var pc = document.querySelector('.month-card[data-month="' + activeMonth + '"]');
       var pp = document.getElementById('panel-' + activeMonth);
       if (pc) pc.classList.remove('active');
-      if (pp) pp.classList.remove('open');
+      if (pp) { pp.classList.remove('open'); pp.style.maxHeight = '0'; }
     }
     var isOpen = panel.classList.contains('open');
     card.classList.toggle('active', !isOpen);
-    panel.classList.toggle('open', !isOpen);
-    activeMonth = isOpen ? null : key;
-    if (!isOpen) setTimeout(function() { panel.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50);
+    if (!isOpen) {
+      panel.classList.add('open');
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      activeMonth = key;
+      setTimeout(function() { panel.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 420);
+    } else {
+      panel.style.maxHeight = '0';
+      panel.classList.remove('open');
+      activeMonth = null;
+    }
   }
 </script>
 </body>
