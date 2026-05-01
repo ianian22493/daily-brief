@@ -686,7 +686,7 @@ def build_index_html(repo_dir):
         cls    = " month-card--current" if g["is_current"] else ""
         animal = MONTH_ICONS[g["month"]]
         month_cards += (
-            f'<div class="month-card{cls}" data-month="{g["key"]}" onclick="toggleMonth(\'{g["key"]}\')">'
+            f'<div class="month-card m{g["month"]}{cls}" data-month="{g["key"]}" onclick="toggleMonth(\'{g["key"]}\')">'
             f'{badge}'
             f'<div class="month-card-animal">{animal}</div>'
             f'<div class="month-card-year">{g["year"]}</div>'
@@ -826,12 +826,21 @@ def build_index_html(repo_dir):
     .brief-row:hover .brief-row-arrow {{ color:var(--navy); transform:translateX(2px); }}
     .month-grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }}
     .month-card {{ border-radius:16px; padding:20px 16px 16px; cursor:pointer; position:relative; overflow:hidden; transition:transform .18s,box-shadow .18s; border:1.5px solid transparent; }}
-    .month-card:nth-child(3n+1) {{ background:linear-gradient(145deg,#2a4060,#1b2d4f); }}
-    .month-card:nth-child(3n+2) {{ background:linear-gradient(145deg,#2d3d55,#1e2e45); }}
-    .month-card:nth-child(3n+3) {{ background:linear-gradient(145deg,#253550,#172540); }}
+    .month-card.m1  {{ background:linear-gradient(145deg,#263c55,#162535); }}
+    .month-card.m2  {{ background:linear-gradient(145deg,#44224a,#2c1532); }}
+    .month-card.m3  {{ background:linear-gradient(145deg,#224530,#142c1e); }}
+    .month-card.m4  {{ background:linear-gradient(145deg,#364820,#202e12); }}
+    .month-card.m5  {{ background:linear-gradient(145deg,#4a2c18,#30190c); }}
+    .month-card.m6  {{ background:linear-gradient(145deg,#184444,#0e2c2c); }}
+    .month-card.m7  {{ background:linear-gradient(145deg,#1a2c6a,#0e1a48); }}
+    .month-card.m8  {{ background:linear-gradient(145deg,#483010,#301f08); }}
+    .month-card.m9  {{ background:linear-gradient(145deg,#4a2e22,#301c14); }}
+    .month-card.m10 {{ background:linear-gradient(145deg,#4c2418,#34160e); }}
+    .month-card.m11 {{ background:linear-gradient(145deg,#383228,#24201a); }}
+    .month-card.m12 {{ background:linear-gradient(145deg,#1e3850,#121f30); }}
     .month-card:hover {{ transform:translateY(-3px); box-shadow:0 10px 30px rgba(15,29,52,.35); }}
     .month-card.active {{ border-color:rgba(201,168,76,.5); }}
-    .month-card--current {{ background:linear-gradient(145deg,#1b3a6e,#0f2550) !important; }}
+    .month-card--current {{ filter:brightness(1.25) !important; }}
     .month-card-ongoing {{ display:inline-flex; align-items:center; gap:5px; background:rgba(110,211,130,.15); border:1px solid rgba(110,211,130,.35); border-radius:20px; padding:3px 10px; font-size:9px; font-weight:700; color:#7de89a; margin-bottom:10px; letter-spacing:.06em; }}
     .month-card-ongoing::before {{ content:''; width:5px; height:5px; border-radius:50%; background:#7de89a; animation:pulse 1.5s ease-in-out infinite; flex-shrink:0; }}
     @keyframes pulse {{ 0%,100%{{opacity:1;}} 50%{{opacity:.3;}} }}
