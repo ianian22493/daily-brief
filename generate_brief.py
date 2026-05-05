@@ -5,7 +5,7 @@ GitHub Actions 每天 01:00 UTC（台灣 09:00）自動執行
 """
 
 import json, os, re
-from datetime import datetime, timezone, timedelta, date, timedelta
+from datetime import datetime, timezone, timedelta, date
 from itertools import groupby
 
 TZ_TW = timezone(timedelta(hours=8))
@@ -55,7 +55,10 @@ def load_used_facts():
     try:
         with open(STATE_FILE, encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except FileNotFoundError:
+        return {"facts": []}
+    except Exception as e:
+        print(f"  ⚠ 警告：brief_state.json 讀取失敗（{e}），冷知識去重記錄暫時歸零")
         return {"facts": []}
 
 
@@ -125,7 +128,6 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
                     time.sleep(wait)
                 else:
                     raise
-        return None
 
     text = None
     errors = []
@@ -143,20 +145,6 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
         print("  ✓ gemini-2.5-flash + google_search")
     except Exception as e:
         errors.append(f"gemini-2.5-flash+search: {e}")
-
-    if text is None:
-        try:
-            text = try_generate(
-                model="gemini-2.5-flash-lite",
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    tools=[types.Tool(google_search=types.GoogleSearch())]
-                ),
-                label="gemini-2.5-flash-lite+search"
-            )
-            print("  ✓ gemini-2.5-flash-lite + google_search")
-        except Exception as e:
-            errors.append(f"gemini-2.5-flash-lite: {e}")
 
     if text is None:
         try:
@@ -650,27 +638,7 @@ def build_index_html(repo_dir):
 
     infos = [get_info(f) for f in files]
 
-    def make_row(item):
-        return (
-            f'<a href="{item["filename"]}" class="brief-row">'
-            f'<div class="brief-date-badge">'
-            f'<div class="badge-day">{item["day"]}</div>'
-            f'<div class="badge-weekday">週{item["weekday_zh"]}</div>'
-            f'</div>'
-            f'<div class="brief-info">'
-            f'<div class="brief-info-title">{item["headline"]}</div>'
-            f'<div class="brief-info-sub">{item["sub"]}</div>'
-            f'</div>'
-            f'<div class="brief-arrow">›</div>'
-            f'</a>'
-        )
-
-    recent_rows = "\n".join(make_row(i) for i in infos if i["is_recent"])
-    if not recent_rows:
-        recent_rows = '<div class="empty-hint">尚無近期簡報</div>'
-
     month_cards  = ""
-    month_panels = ""
     month_groups = []
     for mk, items in groupby(infos, key=lambda x: x["month_key"]):
         items = list(items)
@@ -694,14 +662,6 @@ def build_index_html(repo_dir):
             f'<div class="month-card-name">{MONTH_ZH[g["month"]]}</div>'
             f'<div class="month-card-count">{g["count"]}篇</div>'
             f'</div>\n'
-        )
-        rows = "\n".join(make_row(i) for i in g["items"])
-        month_panels += (
-            f'<div class="month-panel" id="panel-{g["key"]}">'
-            f'<div class="month-panel-header">'
-            f'<span class="month-panel-title">{g["label"]}</span>'
-            f'<button class="month-panel-close" onclick="toggleMonth(\'{g["key"]}\')">✕ 收起</button>'
-            f'</div>{rows}</div>\n'
         )
 
     today_animal = MONTH_ANIMALS[today.month][today.weekday()]
