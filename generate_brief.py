@@ -232,7 +232,6 @@ YUZU_LOGO_SM = """<svg width="28" height="28" viewBox="0 0 34 34" fill="none">
 
 
 def get_special_day_banner(dt):
-    from datetime import timedelta
     today_key = (dt.month, dt.day)
     tom       = (dt + timedelta(days=1))
     tom_key   = (tom.month, tom.day)
