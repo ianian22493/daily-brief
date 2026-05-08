@@ -1,9 +1,7 @@
 name: 每日新聞簡報
 
 on:
-  schedule:
-    - cron: '0 0 * * *'   # 08:00 台灣
-  # 手動觸發（補跑 / 強制重跑用）
+  # 手動觸發（補跑 / 強制重跑 / cron-job.org 外部排程用）
   workflow_dispatch:
     inputs:
       force:
