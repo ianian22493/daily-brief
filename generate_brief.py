@@ -169,25 +169,46 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     if m:
         text = m.group()
 
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError as e:
-        print(f"  ⚠ JSON 解析失敗（{e}），改用無搜尋模式重試...")
-        retry_text = try_generate(
-            model="gemini-2.5-flash",
-            contents=prompt + "\n\n重要：只輸出純 JSON，不含任何引用標記、括號數字或額外說明。",
-            label="gemini-2.5-flash-json-retry"
-        )
-        if retry_text is None:
-            raise
-        retry_text = re.sub(r"^```json\s*", "", retry_text.strip(), flags=re.MULTILINE)
-        retry_text = re.sub(r"^```\s*",     "", retry_text,          flags=re.MULTILINE)
-        retry_text = re.sub(r"\[\d+\]",     "", retry_text)
-        retry_text = retry_text.strip()
-        m2 = re.search(r"\{.*\}", retry_text, re.DOTALL)
+    def clean_and_parse(raw):
+        raw = re.sub(r"^```json\s*", "", raw.strip(), flags=re.MULTILINE)
+        raw = re.sub(r"^```\s*",     "", raw,          flags=re.MULTILINE)
+        raw = re.sub(r"\[\d+\]",     "", raw)
+        raw = raw.strip()
+        m2 = re.search(r"\{.*\}", raw, re.DOTALL)
         if m2:
-            retry_text = m2.group()
-        return json.loads(retry_text)
+            raw = m2.group()
+        return json.loads(raw)
+
+    def is_valid(d):
+        """確認 JSON 結構完整：有 news（至少 1 則）且有 fact"""
+        return (
+            isinstance(d, dict)
+            and isinstance(d.get("news"), list) and len(d["news"]) >= 1
+            and isinstance(d.get("fact"), dict) and d["fact"].get("title")
+        )
+
+    retry_prompt = prompt + "\n\n重要：只輸出純 JSON，格式必須嚴格符合範例，不含任何引用標記、括號數字或額外說明。"
+
+    try:
+        data = clean_and_parse(text)
+        if is_valid(data):
+            return data
+        print(f"  ⚠ JSON 結構不完整（keys: {list(data.keys())}），重試...")
+    except json.JSONDecodeError as e:
+        print(f"  ⚠ JSON 解析失敗（{e}），重試...")
+
+    # 重試：要求純 JSON，無搜尋
+    retry_text = try_generate(
+        model="gemini-2.5-flash",
+        contents=retry_prompt,
+        label="gemini-2.5-flash-json-retry"
+    )
+    if retry_text is None:
+        raise RuntimeError("JSON 結構重試失敗：retry_text 為空")
+    data = clean_and_parse(retry_text)
+    if not is_valid(data):
+        raise RuntimeError(f"重試後 JSON 結構仍不完整：{list(data.keys())}")
+    return data
 
 
 # ════════════════════════════════════════════════════════════════════
