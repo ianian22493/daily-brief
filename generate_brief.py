@@ -214,8 +214,9 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 # ════════════════════════════════════════════════════════════════════
 # HTML 生成：單日 brief 頁面（Yuzu Brief 設計）
 # ════════════════════════════════════════════════════════════════════
-DASHBOARD_URL  = "https://ianian22493.github.io/investment-dashboard/"
-PHOTOSHOP_URL  = "https://ianian22493.github.io/photoshop/"
+DASHBOARD_URL   = "https://ianian22493.github.io/investment-ai/"        # Yuzu Capital OS (新版 iso 辦公室)
+LEGACY_URL      = "https://ianian22493.github.io/investment-dashboard/"  # 舊版 Bloomberg-tab dashboard
+PHOTOSHOP_URL   = "https://ianian22493.github.io/photoshop/"
 
 # Yuzu SVG logo（Y 融入柚子切片）
 YUZU_LOGO_LG = """<svg width="36" height="36" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -466,7 +467,7 @@ def build_brief_html(data, dt):
     </div>
   </a>
   <div class="tn-links">
-    <a class="tn-link" href="{DASHBOARD_URL}" target="_blank">Yuzu Finance</a>
+    <a class="tn-link" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS</a>
     <a class="tn-link cur" href="#">Yuzu Brief</a>
   </div>
 </nav>
@@ -871,7 +872,7 @@ def build_index_html(repo_dir):
     {yuzu_logo_index}
     <div><div class="tn-name">Yuzu Brief</div><div class="tn-sub">Daily News</div></div>
   </div>
-  <a class="tn-fin" href="{DASHBOARD_URL}" target="_blank">Yuzu Finance →</a>
+  <a class="tn-fin" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS →</a>
 </nav>
 <div class="hero">
   <div class="hero-bg-text">YUZU</div>
