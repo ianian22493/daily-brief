@@ -468,6 +468,7 @@ def build_brief_html(data, dt):
   </a>
   <div class="tn-links">
     <a class="tn-link" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS</a>
+    <a class="tn-link" href="{LEGACY_URL}" target="_blank">Yuzu Finance</a>
     <a class="tn-link cur" href="#">Yuzu Brief</a>
   </div>
 </nav>
@@ -872,7 +873,10 @@ def build_index_html(repo_dir):
     {yuzu_logo_index}
     <div><div class="tn-name">Yuzu Brief</div><div class="tn-sub">Daily News</div></div>
   </div>
-  <a class="tn-fin" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS →</a>
+  <div style="display:flex;gap:18px;align-items:center">
+    <a class="tn-fin" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS →</a>
+    <a class="tn-fin" href="{LEGACY_URL}" target="_blank">Yuzu Finance →</a>
+  </div>
 </nav>
 <div class="hero">
   <div class="hero-bg-text">YUZU</div>
