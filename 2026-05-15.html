@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🦝 Yuzu Brief — 2026年5月15日</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg:    #F7F6F2;
+      --bg2:   #EDEBE4;
+      --navy:  #1b2d4f;
+      --navy2: #0f1d34;
+      --ink:   #1a1a1a;
+      --ink2:  #555555;
+      --ink3:  #9ca3af;
+      --border:#E8E4DC;
+      --gold:  #b8922e;
+      --gold-l:#e8c84a;
+      --gold-bg:#fdf8ec;
+      --gold-b:#e8cf85;
+    }
+    body { background:var(--bg); color:var(--ink); font-family:'DM Sans','Noto Sans TC',sans-serif; min-height:100vh; }
+
+    /* Reading bar */
+    #rbar { position:fixed; top:0; left:0; z-index:400; height:3px; width:0%; background:linear-gradient(90deg,var(--navy) 0%,#4d9cf8 100%); transition:width .08s linear; }
+
+    /* Top nav */
+    .topnav { position:sticky; top:0; z-index:300; height:52px; padding:0 28px; background:rgba(243,239,231,.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .tn-brand { display:flex; align-items:center; gap:11px; text-decoration:none; }
+    .tn-name { font-size:14px; font-weight:700; color:var(--ink); }
+    .tn-sub { font-size:9px; color:var(--ink3); letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }
+    .tn-links { display:flex; gap:22px; }
+    .tn-link { font-size:12px; color:var(--ink3); text-decoration:none; letter-spacing:.04em; transition:color .15s; }
+    .tn-link:hover, .tn-link.cur { color:var(--ink); }
+
+    /* Hero */
+    .hero { background:var(--navy2); position:relative; overflow:hidden; }
+    .hero-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .hero-bg svg { position:absolute; inset:0; width:100%; height:100%; opacity:.06; }
+    .hero-inner { max-width:720px; margin:0 auto; padding:52px 32px 0; position:relative; z-index:1; }
+    .hero-layout { display:flex; flex-direction:row; justify-content:space-between; align-items:flex-start; gap:16px; }
+    .hero-left { flex:1; min-width:0; }
+    .hero-eyebrow { font-size:10px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+    .hero-eyebrow::before { content:''; width:18px; height:1px; background:rgba(255,255,255,.2); display:inline-block; }
+    .hero-date { font-family:'Playfair Display','Noto Serif TC',serif; font-weight:900; color:#fff; line-height:1.0; }
+    .hero-date .yr { display:block; font-size:clamp(14px,2vw,18px); font-weight:400; font-style:italic; color:rgba(255,255,255,.38); margin-bottom:4px; }
+    .hero-date .md { display:block; font-size:clamp(28px,6vw,56px); letter-spacing:-.03em; }
+    .hero-weekday { margin-top:20px; display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .hero-badge { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:5px 18px; font-size:12px; color:rgba(255,255,255,.6); font-weight:500; white-space:nowrap; }
+    .hero-slogan { font-size:12px; color:rgba(255,255,255,.55); letter-spacing:.05em; }
+    .hero-animal { width:88px; height:88px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:48px; line-height:1; flex-shrink:0; margin-top:4px; }
+    @media(max-width:640px){ .hero-inner { padding:40px 20px 0; } .hero-animal { width:68px; height:68px; font-size:38px; } .hero-slogan { display:none; } .body-wrap { padding:0 16px 64px; } }
+    .hero-rule { margin-top:36px; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5) 0%,rgba(201,168,76,.0) 60%); }
+    .hero-sections { display:flex; gap:0; padding:13px 0; }
+    .hs-item { font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); padding-right:22px; margin-right:22px; border-right:1px solid rgba(255,255,255,.15); display:flex; align-items:center; gap:6px; }
+    .hs-item:last-child { border-right:none; }
+    .hs-item.hi { color:rgba(255,255,255,.9); }
+
+    /* Body */
+    .body-wrap { max-width:720px; margin:0 auto; padding:0 24px 80px; }
+    .a-sec { padding:44px 0; border-bottom:1px solid var(--border); }
+    .a-sec:last-child { border-bottom:none; }
+    .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .sec-icon { font-size:20px; }
+    .sec-label { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); white-space:nowrap; }
+    .sec-rule { flex:1; height:1px; background:var(--border); }
+    hr { border:none; border-top:1px solid #EAEAEA; margin:32px 0; }
+
+    /* News */
+    .news-list { display:flex; flex-direction:column; gap:14px; }
+    .ni { --ac:#1b2d4f; display:grid; grid-template-columns:52px 1fr; padding:22px 20px 22px 16px; background:#ffffff; border-radius:14px; border:1px solid #EDEAE4; box-shadow:0 2px 8px rgba(0,0,0,.04); transition:opacity .5s ease, transform .3s ease, box-shadow .3s ease; }
+    .ni:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.07); }
+    .ni:hover .ni-title { color:var(--ac); }
+    .ni:hover .ni-num { opacity:.38; }
+    .ni-num { font-family:'Playfair Display',serif; font-size:44px; font-weight:900; line-height:1; color:var(--ac); opacity:.14; letter-spacing:-.03em; transition:opacity .2s; padding-top:4px; text-align:center; }
+    .ni-title { font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(17px,2.5vw,19px); font-weight:700; line-height:1.45; color:var(--ink); margin-bottom:12px; text-wrap:pretty; transition:color .2s ease; border-left:3px solid #D0CBBD; padding-left:10px; }
+    .ni-text { font-size:15px; line-height:1.85; color:var(--ink2); text-wrap:pretty; padding-left:13px; }
+    .ni-lead { display:block; padding-left:14px; border-left:2.5px solid var(--ac); font-size:15px; font-weight:500; line-height:1.8; color:var(--ink2); margin-bottom:12px; }
+
+    /* Fact */
+    .fact-wrap { background:var(--navy); border-radius:20px; overflow:hidden; position:relative; }
+    .fact-wrap::before { content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 65%); pointer-events:none; }
+    .fact-inner { display:grid; grid-template-columns:6px 1fr; }
+    .fact-stripe { background:linear-gradient(180deg,var(--gold-l),rgba(184,146,46,.2)); }
+    .fact-content { padding:34px 36px; }
+    .fact-kicker { font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-l); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .fact-kicker::before { content:''; display:inline-block; width:18px; height:1px; background:var(--gold); }
+    .fact-title { font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(22px,3vw,28px); font-weight:700; color:#fff; margin-bottom:18px; line-height:1.3; }
+    .fact-body { font-size:15px; line-height:2; color:rgba(255,255,255,.78); }
+    .fact-animal { position:absolute; right:28px; bottom:24px; font-size:48px; opacity:.1; line-height:1; }
+
+    /* Special banner */
+    .special-banner { display:flex; align-items:center; gap:16px; border-radius:14px; padding:18px 24px; margin-bottom:0; }
+    .special-banner--today { background:linear-gradient(135deg,#ff6b9d 0%,#ff8c42 100%); box-shadow:0 4px 20px rgba(255,107,157,0.35); }
+    .special-banner--tomorrow { background:linear-gradient(135deg,#fffbea 0%,#fff0c0 100%); border:1.5px solid #ffd54f; }
+    .banner-emoji { font-size:40px; line-height:1; flex-shrink:0; }
+    .banner-title { font-size:17px; font-weight:800; line-height:1.3; }
+    .banner-sub { font-size:13px; margin-top:4px; }
+    .special-banner--today .banner-title { color:#fff; }
+    .special-banner--today .banner-sub { color:rgba(255,255,255,.85); }
+    .special-banner--tomorrow .banner-title { color:#7a4e00; }
+    .special-banner--tomorrow .banner-sub { color:#a06500; }
+
+    /* Footer */
+    .site-footer { max-width:720px; margin:0 auto; padding:24px 24px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+    .sf-brand { display:flex; align-items:center; gap:10px; }
+    .sf-name { font-size:12px; font-weight:600; color:var(--ink3); }
+    .sf-date { font-size:11px; color:var(--ink3); margin-top:1px; }
+    .sf-links { display:flex; gap:20px; }
+    .sf-links a { font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }
+    .sf-links a:hover { color:var(--ink); }
+
+    /* Animations */
+    .js-animate .reveal { opacity:0; transform:translateY(16px); }
+    .js-animate .ni { opacity:0; transform:translateY(16px); }
+    .js-animate .fact-wrap { opacity:0; transform:translateY(16px); }
+    .reveal, .ni, .fact-wrap { transition:opacity .5s ease, transform .5s ease; }
+    .reveal.in, .ni.in, .fact-wrap.in { opacity:1 !important; transform:translateY(0) !important; }
+
+    /* FAB dock */
+    .fab-dock { position:fixed; bottom:28px; right:28px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+    .yuzu-fab { display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#bf9618 0%,#f5e264 42%,#c8a020 100%); color:#1b2d4f; text-decoration:none; padding:10px 18px 10px 10px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 24px rgba(160,122,18,.55),0 2px 5px rgba(0,0,0,.14); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }
+    .yuzu-fab:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 14px 40px rgba(160,122,18,.72),0 2px 8px rgba(0,0,0,.18); animation:none; }
+    .yuzu-fab-cam { display:flex; align-items:center; gap:12px; background:linear-gradient(145deg,#2d2d2d 0%,#1e1e1e 55%,#141414 100%); color:rgba(255,255,255,.93); text-decoration:none; padding:10px 18px 10px 10px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 6px 22px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.2); border:1px solid rgba(255,255,255,.1); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; }
+    .yuzu-fab-cam:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 14px 38px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.28); color:#fff; border-color:rgba(255,255,255,.2); }
+    .yuzu-fab-icon { flex-shrink:0; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .yuzu-fab-cam .yuzu-fab-icon { background:rgba(255,255,255,.1); }
+    .yuzu-fab .yuzu-fab-icon { background:rgba(27,45,79,.16); }
+    .yuzu-fab-text { display:flex; flex-direction:column; line-height:1; }
+    .yuzu-fab-name { font-size:13px; font-weight:800; letter-spacing:.01em; }
+    .yuzu-fab-sub  { font-size:9px; font-weight:600; opacity:.55; letter-spacing:.12em; text-transform:uppercase; margin-top:3px; }
+    .yuzu-fab-arr  { font-size:16px; font-weight:300; opacity:.45; margin-left:4px; transition:transform .2s,opacity .2s; }
+    .yuzu-fab:hover .yuzu-fab-arr, .yuzu-fab-cam:hover .yuzu-fab-arr { transform:translateX(3px); opacity:.9; }
+    @keyframes fab-glow {
+      0%,100% { box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 24px rgba(160,122,18,.55),0 2px 5px rgba(0,0,0,.14); }
+      50%      { box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 42px rgba(160,122,18,.82),0 2px 5px rgba(0,0,0,.14); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="rbar"></div>
+
+
+
+<!-- Nav -->
+<nav class="topnav">
+  <a class="tn-brand" href="index.html">
+    <svg width="36" height="36" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lg1" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg1)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+</svg>
+    <div>
+      <div class="tn-name">Yuzu Brief</div>
+      <div class="tn-sub">Daily News</div>
+    </div>
+  </a>
+  <div class="tn-links">
+    <a class="tn-link" href="https://ianian22493.github.io/investment-ai/" target="_blank">Yuzu Capital OS</a>
+    <a class="tn-link" href="https://ianian22493.github.io/investment-dashboard/" target="_blank">Yuzu Finance</a>
+    <a class="tn-link cur" href="#">Yuzu Brief</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-bg">
+    <svg viewBox="0 0 800 380" preserveAspectRatio="xMidYMid slice" fill="none">
+      <circle cx="700" cy="50" r="200" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="130" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="60"  stroke="white" stroke-width="1"/>
+      <circle cx="100" cy="320" r="150" stroke="white" stroke-width=".7"/>
+      <line x1="700" y1="50" x2="540" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="860" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="700" y2="230" stroke="white" stroke-width=".6"/>
+    </svg>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-layout">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Yuzu Brief · Daily News</div>
+        <div class="hero-date">
+          <span class="yr">2026年</span>
+          <span class="md">5月15日</span>
+        </div>
+        <div class="hero-weekday">
+          <span class="hero-badge">星期五</span>
+          <span class="hero-slogan">用五分鐘，掌握今天的世界</span>
+        </div>
+      </div>
+      <div class="hero-animal">🦝</div>
+    </div>
+    <div class="hero-rule"></div>
+    <div class="hero-sections">
+      <div class="hs-item hi"><span>🌍</span> 全球五大新聞</div>
+      <div class="hs-item" style="color:rgba(255,255,255,.75)"><span>🧠</span> 每日冷知識</div>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="body-wrap">
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🌍</span>
+      <span class="sec-label">全球五大新聞</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="news-list">
+
+      <div class="ni" style="--ac:#1b2d4f">
+        <div class="ni-n"><div class="ni-num">1</div></div>
+        <div class="ni-body">
+          <div class="ni-title">川習會聚焦貿易、伊朗與AI，台灣問題習近平警告勿觸底線</div>
+          <div class="ni-text">美國總統川普與中國國家主席習近平於2026年5月14日在北京舉行會談，聚焦貿易、伊朗衝突與人工智慧（AI）等議題。習近平強調台灣問題是中美關係中最重要問題，警告若處理不當可能導致兩國「碰撞甚至衝突」。川普則稱習近平為「偉大領導人」與「朋友」，並邀請他於9月訪白宮。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#2563eb">
+        <div class="ni-n"><div class="ni-num">2</div></div>
+        <div class="ni-body">
+          <div class="ni-title">IMF樂見川習對話，有助緩解全球經濟不確定性</div>
+          <div class="ni-text">國際貨幣基金（IMF）於2026年5月14日表示，樂見美國總統川普與中國國家主席習近平展開初步且積極的對話，這將有助於降低全球前兩大經濟體之間的緊張局勢與不確定性，對世界經濟有利。IMF發言人科薩克指出，最高層級的接觸至關重要，任何有助於緩解貿易摩擦的舉措，都能為全球經濟注入正面動能。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#0891b2">
+        <div class="ni-n"><div class="ni-num">3</div></div>
+        <div class="ni-body">
+          <div class="ni-title">美國財長貝森特：美中正討論AI護欄機制，防範非國家行為者取得先進模型</div>
+          <div class="ni-text">美國財政部長貝森特於2026年5月14日表示，美中兩國正就人工智慧（AI）護欄機制展開討論，旨在保護最先進的AI模型，防止非國家行為者取得這些創新成果。他指出，全球三大AI領先公司正不斷推動技術進步，能力迅速增強，因此制定規程與最佳實踐準則至關重要。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#7c3aed">
+        <div class="ni-n"><div class="ni-num">4</div></div>
+        <div class="ni-body">
+          <div class="ni-title">利比亞總理辦公室發生火災，足球賽衝突引發首都動亂</div>
+          <div class="ni-text">2026年5月14日晚間，利比亞總理辦公室大樓發生火災，此前塔爾胡納市一場足球比賽爆發激烈衝突並蔓延至首都的黎波里。衝突源於球員抗議裁判判罰，導致球迷衝入場內，襲擊球員並焚燒車輛，隨後在的黎波里多個地區引發槍擊和騷亂。</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#b45309">
+        <div class="ni-n"><div class="ni-num">5</div></div>
+        <div class="ni-body">
+          <div class="ni-title">更新｜英國首季GDP成長0.6%，經濟學家擔憂中東衝突恐影響後續表現</div>
+          <div class="ni-text">英國國家統計局公布，2026年第一季GDP初值按季成長0.6%，創一年來新高，超出英格蘭銀行預測的0.5%增幅，也顯著高於去年第四季的0.2%。然而，經濟學家警告，中東衝突持續造成的能源成本上漲及英國政局動盪，可能導致未來幾季的經濟增長停滯甚至溫和衰退。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🧠</span>
+      <span class="sec-label">每日冷知識</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="fact-wrap">
+      <div class="fact-inner">
+        <div class="fact-stripe"></div>
+        <div class="fact-content">
+          <div class="fact-kicker">Today's Fun Fact</div>
+          <div class="fact-title">人類指甲上的白點可能與缺乏鈣質無關</div>
+          <div class="fact-body">許多人認為指甲上的白點是缺鈣的表現，但這其實是錯誤的迷思。這些白點通常是輕微創傷所致，或是指甲生長過程中氣泡被困在指甲板下的結果，與營養缺乏較無關聯。</div>
+        </div>
+      </div>
+      <div class="fact-animal">🦝</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="sf-brand">
+    <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+  <defs>
+    <radialGradient id="lg2" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg2)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8"  fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"   stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
+    <div>
+      <div class="sf-name">Yuzu Brief · Daily News</div>
+      <div class="sf-date">2026-05-15</div>
+    </div>
+  </div>
+  <div class="sf-links">
+    <a href="index.html">← 所有簡報</a>
+    <a href="https://ianian22493.github.io/investment-ai/" target="_blank">Yuzu Finance →</a>
+  </div>
+</footer>
+
+<!-- FAB dock -->
+<div class="fab-dock">
+  <a class="yuzu-fab-cam" href="https://ianian22493.github.io/photoshop/" target="_blank">
+    <div class="yuzu-fab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+    <div class="yuzu-fab-text">
+      <div class="yuzu-fab-name">Yuzu Photoshop</div>
+      <div class="yuzu-fab-sub">圖片風格工具</div>
+    </div>
+    <div class="yuzu-fab-arr">›</div>
+  </a>
+  <a class="yuzu-fab" href="https://ianian22493.github.io/investment-ai/" target="_blank">
+    <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div class="yuzu-fab-text">
+      <div class="yuzu-fab-name">Yuzu Finance</div>
+      <div class="yuzu-fab-sub">投資儀表板</div>
+    </div>
+    <div class="yuzu-fab-arr">›</div>
+  </a>
+</div>
+
+<script>
+window.addEventListener('scroll', function() {
+  var d = document.documentElement;
+  document.getElementById('rbar').style.width =
+    Math.min((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100, 100) + '%';
+});
+
+document.body.classList.add('js-animate');
+
+var secObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('in'); secObs.unobserve(e.target); } });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(function(el) { secObs.observe(el); });
+
+var listObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.ni').forEach(function(item, i) {
+      setTimeout(function() { item.classList.add('in'); }, i * 100);
+    });
+    e.target.querySelectorAll('.fact-wrap').forEach(function(c) {
+      setTimeout(function() { c.classList.add('in'); }, 150);
+    });
+    listObs.unobserve(e.target);
+  });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.a-sec').forEach(function(el) { listObs.observe(el); });
+
+setTimeout(function() {
+  document.querySelectorAll('.reveal:not(.in)').forEach(function(el) { el.classList.add('in'); });
+  document.querySelectorAll('.ni:not(.in)').forEach(function(el, i) {
+    setTimeout(function() { el.classList.add('in'); }, i * 60);
+  });
+  document.querySelectorAll('.fact-wrap:not(.in)').forEach(function(el) { el.classList.add('in'); });
+}, 900);
+</script>
+</body>
+</html>
