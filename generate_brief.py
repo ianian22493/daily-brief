@@ -214,6 +214,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 # ════════════════════════════════════════════════════════════════════
 # HTML 生成：單日 brief 頁面（Yuzu Brief 設計）
 # ════════════════════════════════════════════════════════════════════
+HUB_URL         = "https://ianian22493.github.io/"                       # 個人首頁入口 Hub（各分頁只回到這裡）
 DASHBOARD_URL   = "https://ianian22493.github.io/investment-ai/"        # Yuzu Capital OS (新版 iso 辦公室)
 LEGACY_URL      = "https://ianian22493.github.io/investment-dashboard/"  # 舊版 Bloomberg-tab dashboard
 PHOTOSHOP_URL   = "https://ianian22493.github.io/photoshop/"
@@ -467,9 +468,7 @@ def build_brief_html(data, dt):
     </div>
   </a>
   <div class="tn-links">
-    <a class="tn-link" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS</a>
-    <a class="tn-link" href="{LEGACY_URL}" target="_blank">Yuzu Finance</a>
-    <a class="tn-link cur" href="#">Yuzu Brief</a>
+    <a class="tn-link" href="{HUB_URL}">← 回到入口</a>
   </div>
 </nav>
 
@@ -555,34 +554,17 @@ def build_brief_html(data, dt):
   </div>
   <div class="sf-links">
     <a href="index.html">← 所有簡報</a>
-    <a href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS →</a>
-    <a href="{LEGACY_URL}" target="_blank">Yuzu Finance →</a>
+    <a href="{HUB_URL}">回到入口 →</a>
   </div>
 </footer>
 
 <!-- FAB dock -->
 <div class="fab-dock">
-  <a class="yuzu-fab-cam" href="{PHOTOSHOP_URL}" target="_blank">
-    <div class="yuzu-fab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+  <a class="yuzu-fab" href="{HUB_URL}">
+    <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg-home" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg-home)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
     <div class="yuzu-fab-text">
-      <div class="yuzu-fab-name">Yuzu Photoshop</div>
-      <div class="yuzu-fab-sub">圖片風格工具</div>
-    </div>
-    <div class="yuzu-fab-arr">›</div>
-  </a>
-  <a class="yuzu-fab" href="{DASHBOARD_URL}" target="_blank">
-    <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg-cap" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#b89bff"/><stop offset="100%" stop-color="#2d1659"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg-cap)"/><line x1="8" y1="12" x2="26" y2="12" stroke="rgba(255,255,255,.75)" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="17" x2="26" y2="17" stroke="rgba(255,255,255,.65)" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="22" x2="26" y2="22" stroke="rgba(255,255,255,.55)" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="12" r="1.2" fill="rgba(255,255,255,.95)"/><circle cx="14" cy="17" r="1.2" fill="rgba(255,255,255,.95)"/><circle cx="11" cy="22" r="1.2" fill="rgba(255,255,255,.95)"/></svg></div>
-    <div class="yuzu-fab-text">
-      <div class="yuzu-fab-name">Yuzu Capital OS</div>
-      <div class="yuzu-fab-sub">AI 投資作業系統</div>
-    </div>
-    <div class="yuzu-fab-arr">›</div>
-  </a>
-  <a class="yuzu-fab" href="{LEGACY_URL}" target="_blank">
-    <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-    <div class="yuzu-fab-text">
-      <div class="yuzu-fab-name">Yuzu Finance</div>
-      <div class="yuzu-fab-sub">投資儀表板</div>
+      <div class="yuzu-fab-name">回到入口</div>
+      <div class="yuzu-fab-sub">Yuzu Home</div>
     </div>
     <div class="yuzu-fab-arr">›</div>
   </a>
@@ -883,8 +865,7 @@ def build_index_html(repo_dir):
     <div><div class="tn-name">Yuzu Brief</div><div class="tn-sub">Daily News</div></div>
   </div>
   <div style="display:flex;gap:18px;align-items:center">
-    <a class="tn-fin" href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS →</a>
-    <a class="tn-fin" href="{LEGACY_URL}" target="_blank">Yuzu Finance →</a>
+    <a class="tn-fin" href="{HUB_URL}">← 回到入口</a>
   </div>
 </nav>
 <div class="hero">
@@ -938,34 +919,17 @@ def build_index_html(repo_dir):
 <footer class="site-footer">
   <div class="sf-brand">{yuzu_logo_index}<div class="sf-name">Yuzu Brief</div></div>
   <div class="sf-links">
-    <a href="{DASHBOARD_URL}" target="_blank">Yuzu Capital OS →</a>
-    <a href="{LEGACY_URL}" target="_blank">Yuzu Finance →</a>
+    <a href="{HUB_URL}">← 回到入口</a>
   </div>
 </footer>
 
 <!-- FAB dock -->
 <div class="fab-dock">
-  <a class="yuzu-fab-cam" href="{PHOTOSHOP_URL}" target="_blank">
-    <div class="yuzu-fab-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+  <a class="yuzu-fab" href="{HUB_URL}">
+    <div class="yuzu-fab-icon"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg-home2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg-home2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
     <div class="yuzu-fab-text">
-      <div class="yuzu-fab-name">Yuzu Photoshop</div>
-      <div class="yuzu-fab-sub">圖片風格工具</div>
-    </div>
-    <div class="yuzu-fab-arr">›</div>
-  </a>
-  <a class="yuzu-fab" href="{DASHBOARD_URL}" target="_blank">
-    <div class="yuzu-fab-icon"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg-cap2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#b89bff"/><stop offset="100%" stop-color="#2d1659"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg-cap2)"/><line x1="8" y1="12" x2="26" y2="12" stroke="rgba(255,255,255,.75)" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="17" x2="26" y2="17" stroke="rgba(255,255,255,.65)" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="22" x2="26" y2="22" stroke="rgba(255,255,255,.55)" stroke-width="1.4" stroke-linecap="round"/><circle cx="11" cy="12" r="1.2" fill="rgba(255,255,255,.95)"/><circle cx="14" cy="17" r="1.2" fill="rgba(255,255,255,.95)"/><circle cx="11" cy="22" r="1.2" fill="rgba(255,255,255,.95)"/></svg></div>
-    <div class="yuzu-fab-text">
-      <div class="yuzu-fab-name">Yuzu Capital OS</div>
-      <div class="yuzu-fab-sub">AI 投資作業系統</div>
-    </div>
-    <div class="yuzu-fab-arr">›</div>
-  </a>
-  <a class="yuzu-fab" href="{LEGACY_URL}" target="_blank">
-    <div class="yuzu-fab-icon"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-    <div class="yuzu-fab-text">
-      <div class="yuzu-fab-name">Yuzu Finance</div>
-      <div class="yuzu-fab-sub">投資儀表板</div>
+      <div class="yuzu-fab-name">回到入口</div>
+      <div class="yuzu-fab-sub">Yuzu Home</div>
     </div>
     <div class="yuzu-fab-arr">›</div>
   </a>
