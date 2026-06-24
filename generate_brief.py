@@ -50,6 +50,25 @@ SPECIAL_DATES = {
 # ════════════════════════════════════════════════════════════════════
 STATE_FILE = "brief_state.json"
 
+# 冷知識類別輪替表（15 個類別，根據累積筆數 mod 15 決定今日類別）
+FACT_CATEGORIES = [
+    "宇宙與天文（太空、星球、宇宙現象、宇宙起源）",
+    "人類歷史與文明（古代文化、戰爭、重大歷史事件、歷史人物）",
+    "語言與文字（詞源、語言奇特性、各地文字系統、翻譯趣事）",
+    "地球科學與地理（地質構造、氣候現象、山脈海洋、地形地貌）",
+    "動物行為與演化（哺乳類、鳥類、爬蟲類的行為或演化奇事）",
+    "人類身體與醫學（生理機制、感官、神經科學、罕見病症）",
+    "植物與真菌（植物生存策略、真菌奇特性、生態共生關係）",
+    "物理與化學（元素、化學反應、力學、光學、量子現象）",
+    "數學與邏輯（悖論、數字趣事、幾何奇觀、統計謬誤）",
+    "食物與飲食科學（食材化學、料理科學、各地飲食文化奇事）",
+    "科技與發明（歷史上的重大發明、工程奇蹟、科技突破）",
+    "心理學與行為科學（認知偏誤、社會實驗、人類決策行為）",
+    "藝術、音樂與文化（創作者趣事、藝術史、各地節慶文化習俗）",
+    "昆蟲、蛛形類與節肢動物（螞蟻、蜘蛛、甲蟲、蝴蝶等）",
+    "海洋生物（深海生物、魚類、珊瑚礁生態、頭足類動物）",
+]
+
 
 def load_used_facts():
     try:
@@ -62,9 +81,9 @@ def load_used_facts():
         return {"facts": []}
 
 
-def save_used_fact(state, date_str, fact_title):
+def save_used_fact(state, date_str, fact_title, fact_category=""):
     state["facts"] = [e for e in state["facts"] if e.get("date") != date_str]
-    state["facts"].append({"date": date_str, "title": fact_title})
+    state["facts"].append({"date": date_str, "title": fact_title, "category": fact_category})
     state["facts"].sort(key=lambda e: e["date"])
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
@@ -79,12 +98,16 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     from google.genai import types
     client = genai.Client(api_key=api_key)
 
-    all_titles = [e["title"] for e in used_facts_state.get("facts", [])]
+    all_facts   = used_facts_state.get("facts", [])
+    all_titles  = [e["title"] for e in all_facts]
+    fact_count  = len(all_facts)
+    today_category = FACT_CATEGORIES[fact_count % len(FACT_CATEGORIES)]
+
     if all_titles:
         avoid_block = (
-            "\n\n⚠️ 冷知識注意事項（非常重要）：以下是過去所有已出現過的冷知識主題，"
-            "請絕對不要重複或使用相似的事實，必須選擇全新的主題：\n"
-            + "\n".join(f"- {t}" for t in all_titles)
+            "以下是過去所有已出現過的冷知識標題，禁止重複，也禁止選擇概念相同但換句話說的主題：\n"
+            + "\n".join(f"  - {t}" for t in all_titles)
+            + "\n"
         )
     else:
         avoid_block = ""
@@ -93,9 +116,17 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 
 你是繁體中文新聞編輯，請搜尋今天（{date_str}）最新的國際新聞，撰寫每日簡報。
 
+═══════════════════════════════════════
+【今日冷知識類別（必須嚴格遵守）】
+→ {today_category}
+請只選擇此類別的主題，禁止選擇其他類別的內容。
+═══════════════════════════════════════
+【禁止重複的冷知識（概念相同即算重複）】
+{avoid_block}═══════════════════════════════════════
+
 任務：
 1. 選出今天最重要的 5 則全球新聞（涵蓋政治、衝突、經濟、社會、科技，優先選有即時新聞的）
-2. 撰寫 1 則有趣的冷知識（科學、歷史、自然等皆可）{avoid_block}
+2. 撰寫 1 則有趣的冷知識，類別必須是「{today_category}」，且不得與上方禁止清單重複
 
 新聞格式要求：
 - 標題：15–30 字，精確描述事件核心，主詞清楚
@@ -192,6 +223,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     try:
         data = clean_and_parse(text)
         if is_valid(data):
+            data['fact']['category'] = today_category
             return data
         print(f"  ⚠ JSON 結構不完整（keys: {list(data.keys())}），重試...")
     except json.JSONDecodeError as e:
@@ -208,6 +240,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     data = clean_and_parse(retry_text)
     if not is_valid(data):
         raise RuntimeError(f"重試後 JSON 結構仍不完整：{list(data.keys())}")
+    data['fact']['category'] = today_category
     return data
 
 
@@ -1043,8 +1076,9 @@ def main():
 
     print("  呼叫 Gemini + Google Search...")
     data = fetch_news(date_str, weekday, used_facts_state)
-    fact_title = data['fact']['title']
-    print(f"  ✓ 取得 {len(data['news'])} 則新聞，冷知識：{fact_title[:25]}…")
+    fact_title    = data['fact']['title']
+    fact_category = data['fact'].get('category', '')
+    print(f"  ✓ 取得 {len(data['news'])} 則新聞，冷知識【{fact_category.split('（')[0]}】：{fact_title[:20]}…")
 
     html_file  = f"{date_str}.html"
     brief_html = build_brief_html(data, now)
@@ -1052,7 +1086,7 @@ def main():
         f.write(brief_html)
     print(f"  ✓ {html_file} 已生成")
 
-    save_used_fact(used_facts_state, date_str, fact_title)
+    save_used_fact(used_facts_state, date_str, fact_title, fact_category)
     print(f"  ✓ brief_state.json 已更新（共 {used_count + 1} 筆冷知識紀錄）")
 
     index_html = build_index_html(".")
