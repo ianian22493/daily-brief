@@ -175,13 +175,14 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 - 每則新聞加上 tag 欄位，從以下選一個最符合的：政治、經濟、科技、衝突、社會、外交、環境、健康、其他
 - 每則新聞加上 source 欄位，填入報導來源媒體的中文簡稱（如：路透社、BBC、彭博、法新社、AP、CNN、紐時、衛報等）
 - 地理多元性：5 則新聞需涵蓋至少 3 個不同地區（亞洲、歐洲、美洲、中東、非洲等），避免集中於單一地區
+- 台灣優先：若當天有重要的台灣、亞洲或兩岸關係相關新聞，5 則中至少 1 則應優先選取
 
 冷知識格式要求：
 - 標題：10–20 字，有趣的事實陳述句
 - 內文：2–3 句話，說明詳情與為何有趣
 
 請輸出純 JSON，不含任何 markdown 標記、說明文字或 code block：
-{{"news":[{{"title":"...","body":"...","tag":"政治","source":"路透社"}},{{"title":"...","body":"...","tag":"經濟","source":"彭博"}},{{"title":"...","body":"...","tag":"科技","source":"BBC"}},{{"title":"...","body":"...","tag":"衝突","source":"AP"}},{{"title":"...","body":"...","tag":"社會","source":"法新社"}}],"fact":{{"title":"...","body":"..."}}}}"""
+{{"news":[{{"title":"...","body":"...","tag":"政治","source":"路透社"}},{{"title":"...","body":"...","tag":"經濟","source":"彭博"}},{{"title":"...","body":"...","tag":"科技","source":"BBC"}},{{"title":"...","body":"...","tag":"衝突","source":"AP"}},{{"title":"...","body":"...","tag":"社會","source":"法新社"}}],"fact":{{"title":"...","body":"...","category":"{today_category.split('（')[0]}"}}}}"""
 
     import time
 
@@ -254,13 +255,19 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
             raw = m2.group()
         return json.loads(raw)
 
+    expected_cat_short = today_category.split('（')[0]
+
     def is_valid(d):
-        """確認 JSON 結構完整：有 5 則 news 且有 fact"""
-        return (
-            isinstance(d, dict)
-            and isinstance(d.get("news"), list) and len(d["news"]) >= 5
-            and isinstance(d.get("fact"), dict) and d["fact"].get("title")
-        )
+        """確認 JSON 結構完整：5 則 news、有 fact、fact 類別符合今日指定類別"""
+        if not (isinstance(d, dict)
+                and isinstance(d.get("news"), list) and len(d["news"]) >= 5
+                and isinstance(d.get("fact"), dict) and d["fact"].get("title")):
+            return False
+        fact_cat = d["fact"].get("category", "")
+        if expected_cat_short not in fact_cat:
+            print(f"  ⚠ fact 類別不符：期望「{expected_cat_short}」，Gemini 回傳「{fact_cat}」")
+            return False
+        return True
 
     retry_prompt = prompt + "\n\n重要：只輸出純 JSON，格式必須嚴格符合範例，不含任何引用標記、括號數字或額外說明。"
 
@@ -1011,6 +1018,8 @@ def build_index_html(repo_dir):
 
     /* FAB dock */
     .fab-dock {{ position:fixed; bottom:28px; right:28px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }}
+    #back-to-top {{ background:rgba(30,30,30,.82); backdrop-filter:blur(8px); color:rgba(255,255,255,.82); border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:6px 14px; font-size:12px; font-weight:700; letter-spacing:.06em; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .3s,transform .2s; box-shadow:0 4px 16px rgba(0,0,0,.3); }}
+    #back-to-top:hover {{ background:rgba(50,50,50,.92); transform:translateY(-2px); }}
     .yuzu-fab {{ display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#bf9618 0%,#f5e264 42%,#c8a020 100%); color:#1b2d4f; text-decoration:none; padding:10px 18px 10px 10px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 24px rgba(160,122,18,.55),0 2px 5px rgba(0,0,0,.14); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }}
     .yuzu-fab:hover {{ transform:translateY(-4px) scale(1.04); box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 14px 40px rgba(160,122,18,.72),0 2px 8px rgba(0,0,0,.18); animation:none; }}
     .yuzu-fab-cam {{ display:flex; align-items:center; gap:12px; background:linear-gradient(145deg,#2d2d2d 0%,#1e1e1e 55%,#141414 100%); color:rgba(255,255,255,.93); text-decoration:none; padding:10px 18px 10px 10px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 6px 22px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.2); border:1px solid rgba(255,255,255,.1); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; }}
@@ -1096,6 +1105,7 @@ def build_index_html(repo_dir):
 
 <!-- FAB dock -->
 <div class="fab-dock">
+  <button id="back-to-top" onclick="window.scrollTo({{top:0,behavior:'smooth'}})" title="回到最新">↑ 最新</button>
   <a class="yuzu-fab" href="{HUB_URL}">
     <div class="yuzu-fab-icon"><svg width="24" height="24" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg-home2" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg-home2)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
     <div class="yuzu-fab-text">
@@ -1107,6 +1117,11 @@ def build_index_html(repo_dir):
 </div>
 
 <script>
+  var backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', function() {{
+    backToTop.style.opacity = window.scrollY > 320 ? '1' : '0';
+    backToTop.style.pointerEvents = window.scrollY > 320 ? 'auto' : 'none';
+  }});
   var activeMonth = null;
   function toggleMonth(key) {{
     var card  = document.querySelector('.month-card[data-month="' + key + '"]');
