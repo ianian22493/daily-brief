@@ -102,17 +102,22 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     fact_count     = len(all_facts)
     today_category = FACT_CATEGORIES[fact_count % len(FACT_CATEGORIES)]
 
-    # 只傳「同類別」的歷史標題給 Gemini，避免清單過長又失焦
-    same_cat_titles = [
-        e["title"] for e in all_facts
-        if e.get("category") == today_category
-    ]
+    # 同類別的標題（精準避重）+ 無類別的舊紀錄（遷移前的歷史，全數列入）
+    same_cat_titles = [e["title"] for e in all_facts if e.get("category") == today_category]
+    legacy_titles   = [e["title"] for e in all_facts if not e.get("category")]
+
+    avoid_lines = []
     if same_cat_titles:
+        avoid_lines.append(f"【同類別（{today_category.split('（')[0]}）過去已出現】")
+        avoid_lines += [f"  - {t}" for t in same_cat_titles]
+    if legacy_titles:
+        avoid_lines.append("【舊紀錄（類別未知，一律避開）】")
+        avoid_lines += [f"  - {t}" for t in legacy_titles]
+
+    if avoid_lines:
         avoid_block = (
-            f"以下是過去同類別（{today_category.split('（')[0]}）已出現的冷知識標題，"
-            "禁止重複，也禁止選擇概念相同但換句話說的主題：\n"
-            + "\n".join(f"  - {t}" for t in same_cat_titles)
-            + "\n"
+            "以下冷知識禁止重複，概念相同但換句話說也算重複：\n"
+            + "\n".join(avoid_lines) + "\n"
         )
     else:
         avoid_block = ""
