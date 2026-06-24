@@ -173,6 +173,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 - 使用繁體中文，語氣中立客觀
 - 若為昨日已報導但今日有新進展的事件，標題前加「📌 更新｜」
 - 每則新聞加上 tag 欄位，從以下選一個最符合的：政治、經濟、科技、衝突、社會、外交、環境、健康、其他
+- 每則新聞加上 source 欄位，填入報導來源媒體的中文簡稱（如：路透社、BBC、彭博、法新社、AP、CNN、紐時、衛報等）
 - 地理多元性：5 則新聞需涵蓋至少 3 個不同地區（亞洲、歐洲、美洲、中東、非洲等），避免集中於單一地區
 
 冷知識格式要求：
@@ -180,7 +181,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 - 內文：2–3 句話，說明詳情與為何有趣
 
 請輸出純 JSON，不含任何 markdown 標記、說明文字或 code block：
-{{"news":[{{"title":"...","body":"...","tag":"政治"}},{{"title":"...","body":"...","tag":"經濟"}},{{"title":"...","body":"...","tag":"科技"}},{{"title":"...","body":"...","tag":"衝突"}},{{"title":"...","body":"...","tag":"社會"}}],"fact":{{"title":"...","body":"..."}}}}"""
+{{"news":[{{"title":"...","body":"...","tag":"政治","source":"路透社"}},{{"title":"...","body":"...","tag":"經濟","source":"彭博"}},{{"title":"...","body":"...","tag":"科技","source":"BBC"}},{{"title":"...","body":"...","tag":"衝突","source":"AP"}},{{"title":"...","body":"...","tag":"社會","source":"法新社"}}],"fact":{{"title":"...","body":"..."}}}}"""
 
     import time
 
@@ -254,10 +255,10 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
         return json.loads(raw)
 
     def is_valid(d):
-        """確認 JSON 結構完整：有 news（至少 1 則）且有 fact"""
+        """確認 JSON 結構完整：有 5 則 news 且有 fact"""
         return (
             isinstance(d, dict)
-            and isinstance(d.get("news"), list) and len(d["news"]) >= 1
+            and isinstance(d.get("news"), list) and len(d["news"]) >= 5
             and isinstance(d.get("fact"), dict) and d["fact"].get("title")
         )
 
@@ -398,11 +399,13 @@ def build_brief_html(data, dt, prev_date=None, next_date=None):
     for i, item in enumerate(data["news"][:5], 1):
         ac        = NEWS_ACCENT_COLORS[i - 1]
         tag       = item.get("tag", "").strip()
+        source    = item.get("source", "").strip()
         tag_color = NEWS_TAG_COLORS.get(tag, "#6b7280")
         tag_html  = (
             f'<span class="ni-tag" style="background:{tag_color}18;color:{tag_color};'
             f'border-color:{tag_color}35">{tag}</span>'
         ) if tag else ""
+        source_html = f'<div class="ni-source">— {source}</div>' if source else ""
         news_html += f"""
       <div class="ni" style="--ac:{ac}">
         <div class="ni-n"><div class="ni-num">{i}</div></div>
@@ -410,6 +413,7 @@ def build_brief_html(data, dt, prev_date=None, next_date=None):
           {tag_html}
           <div class="ni-title">{item['title']}</div>
           <div class="ni-text">{item['body']}</div>
+          {source_html}
         </div>
       </div>"""
 
@@ -546,6 +550,7 @@ def build_brief_html(data, dt, prev_date=None, next_date=None):
 
     /* News tag */
     .ni-tag {{ display:inline-block; font-size:10px; font-weight:700; letter-spacing:.08em; padding:2px 9px; border-radius:20px; border:1px solid; margin-bottom:8px; }}
+    .ni-source {{ font-size:11px; color:var(--ink3); margin-top:8px; padding-left:13px; letter-spacing:.02em; }}
 
     /* Nav dim (no prev/next) */
     .tn-nav--dim {{ opacity:.3; cursor:default; }}
@@ -1139,10 +1144,11 @@ def backfill_all(repo_dir="."):
     files = sorted(
         [f for f in os.listdir(repo_dir) if re.match(r"^\d{4}-\d{2}-\d{2}\.html$", f)]
     )
+    all_dates = [f[:10] for f in files]
     print(f"🔄 Backfill 開始，共 {len(files)} 個檔案")
     ok = skip = 0
 
-    for filename in files:
+    for i_file, filename in enumerate(files):
         filepath = os.path.join(repo_dir, filename)
         date_str = filename[:10]
         try:
@@ -1170,7 +1176,9 @@ def backfill_all(repo_dir="."):
             data = {"news": news, "fact": {"title": fact_titles[0].strip(),
                                            "body": fact_bodies[0].strip() if fact_bodies else ""}}
 
-            new_html = build_brief_html(data, dt)
+            prev_date = all_dates[i_file - 1] if i_file > 0 else None
+            next_date = all_dates[i_file + 1] if i_file < len(all_dates) - 1 else None
+            new_html = build_brief_html(data, dt, prev_date, next_date)
             with open(filepath, "w", encoding="utf-8") as f:
                 f.write(new_html)
             print(f"  ✓ {filename}")
