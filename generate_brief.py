@@ -69,6 +69,24 @@ FACT_CATEGORIES = [
     "海洋生物（深海生物、魚類、珊瑚礁生態、頭足類動物）",
 ]
 
+FACT_CATEGORY_ICONS = {
+    "宇宙與天文":       "🌌",
+    "人類歷史與文明":   "🏛️",
+    "語言與文字":       "📝",
+    "地球科學與地理":   "🌍",
+    "動物行為與演化":   "🦁",
+    "人類身體與醫學":   "🧬",
+    "植物與真菌":       "🌿",
+    "物理與化學":       "⚗️",
+    "數學與邏輯":       "🔢",
+    "食物與飲食科學":   "🍳",
+    "科技與發明":       "⚙️",
+    "心理學與行為科學": "🧠",
+    "藝術、音樂與文化": "🎨",
+    "昆蟲、蛛形類與節肢動物": "🪲",
+    "海洋生物":         "🐠",
+}
+
 
 def load_used_facts():
     try:
@@ -81,9 +99,20 @@ def load_used_facts():
         return {"facts": []}
 
 
-def save_used_fact(state, date_str, fact_title, fact_category=""):
+def save_used_fact(state, date_str, fact_title, fact_category="", news_list=None):
+    headline, sub = "", ""
+    if news_list:
+        titles = [re.sub(r"<[^>]+>", "", n.get("title", "")).replace("📌 更新｜", "").strip() for n in news_list]
+        if titles:
+            headline = titles[0][:38] + ("…" if len(titles[0]) > 38 else "")
+        if len(titles) >= 3:
+            sub = " · ".join(t[:16] + ("…" if len(t) > 16 else "") for t in titles[1:3])
     state["facts"] = [e for e in state["facts"] if e.get("date") != date_str]
-    state["facts"].append({"date": date_str, "title": fact_title, "category": fact_category})
+    state["facts"].append({
+        "date": date_str, "title": fact_title,
+        "category": fact_category,
+        "headline": headline, "sub": sub,
+    })
     state["facts"].sort(key=lambda e: e["date"])
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
@@ -171,6 +200,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
                     raise
 
     text = None
+    is_fallback = False
     errors = []
 
     try:
@@ -194,6 +224,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
                 contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）",
                 label="gemini-2.5-flash-fallback"
             )
+            is_fallback = True
             print("  ⚠ gemini-2.5-flash fallback（無搜尋）")
         except Exception as e:
             errors.append(f"gemini-2.5-flash fallback: {e}")
@@ -234,6 +265,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
         data = clean_and_parse(text)
         if is_valid(data):
             data['fact']['category'] = today_category
+            data['_fallback'] = is_fallback
             return data
         print(f"  ⚠ JSON 結構不完整（keys: {list(data.keys())}），重試...")
     except json.JSONDecodeError as e:
@@ -251,6 +283,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     if not is_valid(data):
         raise RuntimeError(f"重試後 JSON 結構仍不完整：{list(data.keys())}")
     data['fact']['category'] = today_category
+    data['_fallback'] = is_fallback
     return data
 
 
@@ -337,6 +370,7 @@ def build_brief_html(data, dt):
     weekday        = WEEKDAY_ZH[dt.weekday()]
     animal         = MONTH_ANIMALS[dt.month][dt.weekday()]
     special_banner = get_special_day_banner(dt)
+    is_fallback    = data.get('_fallback', False)
 
     # 新聞 HTML
     news_html = ""
@@ -352,6 +386,25 @@ def build_brief_html(data, dt):
       </div>"""
 
     fact = data["fact"]
+    fact_cat_full  = fact.get('category', '')
+    fact_cat_short = fact_cat_full.split('（')[0]
+    fact_cat_icon  = FACT_CATEGORY_ICONS.get(fact_cat_short, '🔍')
+    fact_cat_badge = (
+        f'<div class="fact-cat-badge">{fact_cat_icon} {fact_cat_short}</div>'
+        if fact_cat_short else ""
+    )
+
+    og_title = f"{date_zh} Yuzu Brief"
+    og_desc  = data['news'][0]['title'] if data.get('news') else og_title
+    og_desc  = re.sub(r"<[^>]+>", "", og_desc).replace("📌 更新｜", "").strip()[:100]
+
+    fallback_banner = ""
+    if is_fallback:
+        fallback_banner = (
+            '<div class="fallback-banner">'
+            '⚠️ 本期新聞由 AI 訓練資料生成，非即時搜尋結果，請以正式媒體為準'
+            '</div>'
+        )
 
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant">
@@ -359,6 +412,10 @@ def build_brief_html(data, dt):
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{animal} Yuzu Brief — {date_zh}</title>
+  <meta name="description" content="{og_desc}"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="{og_title}"/>
+  <meta property="og:description" content="{og_desc}"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -459,6 +516,12 @@ def build_brief_html(data, dt):
     .special-banner--tomorrow .banner-title {{ color:#7a4e00; }}
     .special-banner--tomorrow .banner-sub {{ color:#a06500; }}
 
+    /* Fact category badge */
+    .fact-cat-badge {{ display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:3px 12px; font-size:11px; font-weight:600; letter-spacing:.06em; color:rgba(255,255,255,.75); margin-bottom:14px; }}
+
+    /* Fallback banner */
+    .fallback-banner {{ background:#7c2d12; color:#fde8d8; font-size:12px; font-weight:500; text-align:center; padding:8px 16px; letter-spacing:.02em; }}
+
     /* Footer */
     .site-footer {{ max-width:720px; margin:0 auto; padding:24px 24px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }}
     .sf-brand {{ display:flex; align-items:center; gap:10px; }}
@@ -499,6 +562,7 @@ def build_brief_html(data, dt):
 
 <div id="rbar"></div>
 
+{fallback_banner}
 {special_banner}
 
 <!-- Nav -->
@@ -576,6 +640,7 @@ def build_brief_html(data, dt):
         <div class="fact-stripe"></div>
         <div class="fact-content">
           <div class="fact-kicker">Today's Fun Fact</div>
+          {fact_cat_badge}
           <div class="fact-title">{fact['title']}</div>
           <div class="fact-body">{fact['body']}</div>
         </div>
@@ -665,22 +730,39 @@ def build_index_html(repo_dir):
         reverse=True
     )
 
+    # 從 brief_state.json 讀取快取的 headline/sub（避免重開每個 HTML 檔）
+    try:
+        with open(os.path.join(repo_dir, STATE_FILE), encoding="utf-8") as f:
+            _state = json.load(f)
+        _cache = {e["date"]: e for e in _state.get("facts", [])}
+    except Exception:
+        _cache = {}
+
     def get_info(filename):
-        d = datetime.strptime(filename[:10], "%Y-%m-%d").date()
-        headline, sub = "點擊閱讀", ""
-        try:
-            with open(os.path.join(repo_dir, filename), encoding="utf-8") as f:
-                content = f.read()
-            titles = re.findall(r'class="news-title">(.*?)</div>', content)
-            if not titles:
-                titles = re.findall(r'class="ni-title">(.*?)</div>', content)
-            titles = [re.sub(r"<[^>]+>", "", t).replace("📌 更新｜", "").strip() for t in titles]
-            if titles:
-                headline = titles[0][:38] + ("…" if len(titles[0]) > 38 else "")
-            if len(titles) >= 3:
-                sub = " · ".join(t[:16] + ("…" if len(t) > 16 else "") for t in titles[1:3])
-        except Exception:
-            pass
+        d        = datetime.strptime(filename[:10], "%Y-%m-%d").date()
+        date_key = filename[:10]
+        cached   = _cache.get(date_key, {})
+        headline = cached.get("headline", "")
+        sub      = cached.get("sub", "")
+
+        # 舊紀錄無快取時，仍 fallback 讀 HTML
+        if not headline:
+            try:
+                with open(os.path.join(repo_dir, filename), encoding="utf-8") as f:
+                    content = f.read()
+                titles = re.findall(r'class="news-title">(.*?)</div>', content)
+                if not titles:
+                    titles = re.findall(r'class="ni-title">(.*?)</div>', content)
+                titles = [re.sub(r"<[^>]+>", "", t).replace("📌 更新｜", "").strip() for t in titles]
+                if titles:
+                    headline = titles[0][:38] + ("…" if len(titles[0]) > 38 else "")
+                if len(titles) >= 3:
+                    sub = " · ".join(t[:16] + ("…" if len(t) > 16 else "") for t in titles[1:3])
+            except Exception:
+                pass
+        if not headline:
+            headline = "點擊閱讀"
+
         return {
             "filename": filename, "date": d,
             "day": d.day, "month": d.month, "year": d.year,
@@ -788,6 +870,10 @@ def build_index_html(repo_dir):
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{today_animal} Yuzu Brief — 每日簡報</title>
+  <meta name="description" content="Yuzu Brief — 每天五分鐘，掌握全球重要新聞與每日冷知識"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Yuzu Brief — 每日簡報"/>
+  <meta property="og:description" content="Yuzu Brief — 每天五分鐘，掌握全球重要新聞與每日冷知識"/>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -1096,7 +1182,7 @@ def main():
         f.write(brief_html)
     print(f"  ✓ {html_file} 已生成")
 
-    save_used_fact(used_facts_state, date_str, fact_title, fact_category)
+    save_used_fact(used_facts_state, date_str, fact_title, fact_category, data.get('news', []))
     print(f"  ✓ brief_state.json 已更新（共 {used_count + 1} 筆冷知識紀錄）")
 
     index_html = build_index_html(".")
