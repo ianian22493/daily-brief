@@ -98,15 +98,20 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     from google.genai import types
     client = genai.Client(api_key=api_key)
 
-    all_facts   = used_facts_state.get("facts", [])
-    all_titles  = [e["title"] for e in all_facts]
-    fact_count  = len(all_facts)
+    all_facts      = used_facts_state.get("facts", [])
+    fact_count     = len(all_facts)
     today_category = FACT_CATEGORIES[fact_count % len(FACT_CATEGORIES)]
 
-    if all_titles:
+    # 只傳「同類別」的歷史標題給 Gemini，避免清單過長又失焦
+    same_cat_titles = [
+        e["title"] for e in all_facts
+        if e.get("category") == today_category
+    ]
+    if same_cat_titles:
         avoid_block = (
-            "以下是過去所有已出現過的冷知識標題，禁止重複，也禁止選擇概念相同但換句話說的主題：\n"
-            + "\n".join(f"  - {t}" for t in all_titles)
+            f"以下是過去同類別（{today_category.split('（')[0]}）已出現的冷知識標題，"
+            "禁止重複，也禁止選擇概念相同但換句話說的主題：\n"
+            + "\n".join(f"  - {t}" for t in same_cat_titles)
             + "\n"
         )
     else:
