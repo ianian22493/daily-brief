@@ -172,13 +172,15 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 - 內文：2–4 句話，說明背景、事件經過與影響
 - 使用繁體中文，語氣中立客觀
 - 若為昨日已報導但今日有新進展的事件，標題前加「📌 更新｜」
+- 每則新聞加上 tag 欄位，從以下選一個最符合的：政治、經濟、科技、衝突、社會、外交、環境、健康、其他
+- 地理多元性：5 則新聞需涵蓋至少 3 個不同地區（亞洲、歐洲、美洲、中東、非洲等），避免集中於單一地區
 
 冷知識格式要求：
 - 標題：10–20 字，有趣的事實陳述句
 - 內文：2–3 句話，說明詳情與為何有趣
 
 請輸出純 JSON，不含任何 markdown 標記、說明文字或 code block：
-{{"news":[{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}},{{"title":"...","body":"..."}}],"fact":{{"title":"...","body":"..."}}}}"""
+{{"news":[{{"title":"...","body":"...","tag":"政治"}},{{"title":"...","body":"...","tag":"經濟"}},{{"title":"...","body":"...","tag":"科技"}},{{"title":"...","body":"...","tag":"衝突"}},{{"title":"...","body":"...","tag":"社會"}}],"fact":{{"title":"...","body":"..."}}}}"""
 
     import time
 
@@ -361,8 +363,21 @@ def get_special_day_banner(dt):
 # 每則新聞的 accent 色
 NEWS_ACCENT_COLORS = ["#1b2d4f", "#2563eb", "#0891b2", "#7c3aed", "#b45309"]
 
+# 新聞主題標籤顏色
+NEWS_TAG_COLORS = {
+    "政治": "#2563eb",
+    "經濟": "#059669",
+    "科技": "#7c3aed",
+    "衝突": "#dc2626",
+    "社會": "#d97706",
+    "外交": "#0891b2",
+    "環境": "#16a34a",
+    "健康": "#db2777",
+    "其他": "#6b7280",
+}
 
-def build_brief_html(data, dt):
+
+def build_brief_html(data, dt, prev_date=None, next_date=None):
     date_str       = dt.strftime("%Y-%m-%d")
     date_zh        = f"{dt.year}年{dt.month}月{dt.day}日"
     year_zh        = f"{dt.year}年"
@@ -372,14 +387,27 @@ def build_brief_html(data, dt):
     special_banner = get_special_day_banner(dt)
     is_fallback    = data.get('_fallback', False)
 
-    # 新聞 HTML
+    # 上下頁導覽
+    prev_link = (f'<a class="tn-link tn-nav" href="{prev_date}.html">← {prev_date[5:]}</a>'
+                 if prev_date else '<span class="tn-link tn-nav tn-nav--dim">← 最舊</span>')
+    next_link = (f'<a class="tn-link tn-nav" href="{next_date}.html">{next_date[5:]} →</a>'
+                 if next_date else '<span class="tn-link tn-nav tn-nav--dim">最新 →</span>')
+
+    # 新聞 HTML（含 tag 標籤）
     news_html = ""
     for i, item in enumerate(data["news"][:5], 1):
-        ac = NEWS_ACCENT_COLORS[i - 1]
+        ac        = NEWS_ACCENT_COLORS[i - 1]
+        tag       = item.get("tag", "").strip()
+        tag_color = NEWS_TAG_COLORS.get(tag, "#6b7280")
+        tag_html  = (
+            f'<span class="ni-tag" style="background:{tag_color}18;color:{tag_color};'
+            f'border-color:{tag_color}35">{tag}</span>'
+        ) if tag else ""
         news_html += f"""
       <div class="ni" style="--ac:{ac}">
         <div class="ni-n"><div class="ni-num">{i}</div></div>
         <div class="ni-body">
+          {tag_html}
           <div class="ni-title">{item['title']}</div>
           <div class="ni-text">{item['body']}</div>
         </div>
@@ -516,6 +544,12 @@ def build_brief_html(data, dt):
     .special-banner--tomorrow .banner-title {{ color:#7a4e00; }}
     .special-banner--tomorrow .banner-sub {{ color:#a06500; }}
 
+    /* News tag */
+    .ni-tag {{ display:inline-block; font-size:10px; font-weight:700; letter-spacing:.08em; padding:2px 9px; border-radius:20px; border:1px solid; margin-bottom:8px; }}
+
+    /* Nav dim (no prev/next) */
+    .tn-nav--dim {{ opacity:.3; cursor:default; }}
+
     /* Fact category badge */
     .fact-cat-badge {{ display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:3px 12px; font-size:11px; font-weight:600; letter-spacing:.06em; color:rgba(255,255,255,.75); margin-bottom:14px; }}
 
@@ -575,7 +609,10 @@ def build_brief_html(data, dt):
     </div>
   </a>
   <div class="tn-links">
-    <a class="tn-link" href="{HUB_URL}">← 回到入口</a>
+    {prev_link}
+    <a class="tn-link" href="index.html">所有簡報</a>
+    {next_link}
+    <a class="tn-link" href="{HUB_URL}">回到入口</a>
   </div>
 </nav>
 
@@ -1176,11 +1213,21 @@ def main():
     fact_category = data['fact'].get('category', '')
     print(f"  ✓ 取得 {len(data['news'])} 則新聞，冷知識【{fact_category.split('（')[0]}】：{fact_title[:20]}…")
 
-    html_file  = f"{date_str}.html"
-    brief_html = build_brief_html(data, now)
+    html_file = f"{date_str}.html"
+
+    # 計算前後日（掃描已有 HTML 檔，加入今日後排序）
+    all_dates = sorted({
+        f[:10] for f in os.listdir(".")
+        if re.match(r"^\d{4}-\d{2}-\d{2}\.html$", f)
+    } | {date_str})
+    idx       = all_dates.index(date_str)
+    prev_date = all_dates[idx - 1] if idx > 0 else None
+    next_date = all_dates[idx + 1] if idx < len(all_dates) - 1 else None
+
+    brief_html = build_brief_html(data, now, prev_date, next_date)
     with open(html_file, "w", encoding="utf-8") as f:
         f.write(brief_html)
-    print(f"  ✓ {html_file} 已生成")
+    print(f"  ✓ {html_file} 已生成（prev={prev_date} next={next_date}）")
 
     save_used_fact(used_facts_state, date_str, fact_title, fact_category, data.get('news', []))
     print(f"  ✓ brief_state.json 已更新（共 {used_count + 1} 筆冷知識紀錄）")
