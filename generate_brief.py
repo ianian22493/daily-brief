@@ -187,7 +187,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     import time
 
     def try_generate(model, contents, config=None, label=""):
-        for attempt in range(3):
+        for attempt in range(5):
             try:
                 if config:
                     resp = client.models.generate_content(model=model, contents=contents, config=config)
@@ -196,7 +196,7 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
                 return resp.text
             except Exception as e:
                 msg = str(e)
-                if "503" in msg and attempt < 2:
+                if "503" in msg and attempt < 4:
                     wait = 20 * (attempt + 1)
                     print(f"  ⏳ {label} 503 繁忙，{wait}秒後重試（第{attempt+1}次）...")
                     time.sleep(wait)
