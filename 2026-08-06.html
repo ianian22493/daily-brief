@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🦞 Yuzu Brief — 2026年8月6日</title>
+  <meta name="description" content="美軍彈藥庫存嚴重枯竭，恐削弱應對未來衝突戰備能力"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="2026年8月6日 Yuzu Brief"/>
+  <meta property="og:description" content="美軍彈藥庫存嚴重枯竭，恐削弱應對未來衝突戰備能力"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg:    #F7F6F2;
+      --bg2:   #EDEBE4;
+      --navy:  #1b2d4f;
+      --navy2: #0f1d34;
+      --ink:   #1a1a1a;
+      --ink2:  #555555;
+      --ink3:  #9ca3af;
+      --border:#E8E4DC;
+      --gold:  #b8922e;
+      --gold-l:#e8c84a;
+      --gold-bg:#fdf8ec;
+      --gold-b:#e8cf85;
+    }
+    body { background:var(--bg); color:var(--ink); font-family:'DM Sans','Noto Sans TC',sans-serif; min-height:100vh; }
+
+    /* Reading bar */
+    #rbar { position:fixed; top:0; left:0; z-index:400; height:3px; width:0%; background:linear-gradient(90deg,var(--navy) 0%,#4d9cf8 100%); transition:width .08s linear; }
+
+    /* Top nav */
+    .topnav { position:sticky; top:0; z-index:300; height:52px; padding:0 28px; background:rgba(243,239,231,.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .tn-brand { display:flex; align-items:center; gap:11px; text-decoration:none; }
+    .tn-name { font-size:14px; font-weight:700; color:var(--ink); }
+    .tn-sub { font-size:9px; color:var(--ink3); letter-spacing:.12em; text-transform:uppercase; margin-top:1px; }
+    .tn-links { display:flex; gap:22px; }
+    .tn-link { font-size:12px; color:var(--ink3); text-decoration:none; letter-spacing:.04em; transition:color .15s; }
+    .tn-link:hover, .tn-link.cur { color:var(--ink); }
+
+    /* Hero */
+    .hero { background:var(--navy2); position:relative; overflow:hidden; }
+    .hero-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .hero-bg svg { position:absolute; inset:0; width:100%; height:100%; opacity:.06; }
+    .hero-inner { max-width:720px; margin:0 auto; padding:52px 32px 0; position:relative; z-index:1; }
+    .hero-layout { display:flex; flex-direction:row; justify-content:space-between; align-items:flex-start; gap:16px; }
+    .hero-left { flex:1; min-width:0; }
+    .hero-eyebrow { font-size:10px; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:rgba(255,255,255,.28); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+    .hero-eyebrow::before { content:''; width:18px; height:1px; background:rgba(255,255,255,.2); display:inline-block; }
+    .hero-date { font-family:'Playfair Display','Noto Serif TC',serif; font-weight:900; color:#fff; line-height:1.0; }
+    .hero-date .yr { display:block; font-size:clamp(14px,2vw,18px); font-weight:400; font-style:italic; color:rgba(255,255,255,.38); margin-bottom:4px; }
+    .hero-date .md { display:block; font-size:clamp(28px,6vw,56px); letter-spacing:-.03em; }
+    .hero-weekday { margin-top:20px; display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .hero-badge { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:5px 18px; font-size:12px; color:rgba(255,255,255,.6); font-weight:500; white-space:nowrap; }
+    .hero-slogan { font-size:12px; color:rgba(255,255,255,.55); letter-spacing:.05em; }
+    .hero-animal { width:88px; height:88px; background:rgba(255,255,255,.07); border:1.5px solid rgba(255,255,255,.13); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:48px; line-height:1; flex-shrink:0; margin-top:4px; }
+    @media(max-width:640px){ .hero-inner { padding:40px 20px 0; } .hero-animal { width:68px; height:68px; font-size:38px; } .hero-slogan { display:none; } .body-wrap { padding:0 16px 64px; } }
+    .hero-rule { margin-top:36px; height:1px; background:linear-gradient(90deg,rgba(201,168,76,.5) 0%,rgba(201,168,76,.0) 60%); }
+    .hero-sections { display:flex; gap:0; padding:13px 0; }
+    .hs-item { font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.55); padding-right:22px; margin-right:22px; border-right:1px solid rgba(255,255,255,.15); display:flex; align-items:center; gap:6px; }
+    .hs-item:last-child { border-right:none; }
+    .hs-item.hi { color:rgba(255,255,255,.9); }
+
+    /* Body */
+    .body-wrap { max-width:720px; margin:0 auto; padding:0 24px 80px; }
+    .a-sec { padding:44px 0; border-bottom:1px solid var(--border); }
+    .a-sec:last-child { border-bottom:none; }
+    .sec-head { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+    .sec-icon { font-size:20px; }
+    .sec-label { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3); white-space:nowrap; }
+    .sec-rule { flex:1; height:1px; background:var(--border); }
+    hr { border:none; border-top:1px solid #EAEAEA; margin:32px 0; }
+
+    /* News */
+    .news-list { display:flex; flex-direction:column; gap:14px; }
+    .ni { --ac:#1b2d4f; display:grid; grid-template-columns:52px 1fr; padding:22px 20px 22px 16px; background:#ffffff; border-radius:14px; border:1px solid #EDEAE4; box-shadow:0 2px 8px rgba(0,0,0,.04); transition:opacity .5s ease, transform .3s ease, box-shadow .3s ease; }
+    .ni:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.07); }
+    .ni:hover .ni-title { color:var(--ac); }
+    .ni:hover .ni-num { opacity:.38; }
+    .ni-num { font-family:'Playfair Display',serif; font-size:44px; font-weight:900; line-height:1; color:var(--ac); opacity:.14; letter-spacing:-.03em; transition:opacity .2s; padding-top:4px; text-align:center; }
+    .ni-title { font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(17px,2.5vw,19px); font-weight:700; line-height:1.45; color:var(--ink); margin-bottom:12px; text-wrap:pretty; transition:color .2s ease; border-left:3px solid #D0CBBD; padding-left:10px; }
+    .ni-text { font-size:15px; line-height:1.85; color:var(--ink2); text-wrap:pretty; padding-left:13px; }
+    .ni-lead { display:block; padding-left:14px; border-left:2.5px solid var(--ac); font-size:15px; font-weight:500; line-height:1.8; color:var(--ink2); margin-bottom:12px; }
+
+    /* Fact */
+    .fact-wrap { background:var(--navy); border-radius:20px; overflow:hidden; position:relative; }
+    .fact-wrap::before { content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 65%); pointer-events:none; }
+    .fact-inner { display:grid; grid-template-columns:6px 1fr; }
+    .fact-stripe { background:linear-gradient(180deg,var(--gold-l),rgba(184,146,46,.2)); }
+    .fact-content { padding:34px 36px; }
+    .fact-kicker { font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--gold-l); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .fact-kicker::before { content:''; display:inline-block; width:18px; height:1px; background:var(--gold); }
+    .fact-title { font-family:'Playfair Display','Noto Serif TC',serif; font-size:clamp(22px,3vw,28px); font-weight:700; color:#fff; margin-bottom:18px; line-height:1.3; }
+    .fact-body { font-size:15px; line-height:2; color:rgba(255,255,255,.78); }
+    .fact-animal { position:absolute; right:28px; bottom:24px; font-size:48px; opacity:.1; line-height:1; }
+
+    /* Special banner */
+    .special-banner { display:flex; align-items:center; gap:16px; border-radius:14px; padding:18px 24px; margin-bottom:0; }
+    .special-banner--today { background:linear-gradient(135deg,#ff6b9d 0%,#ff8c42 100%); box-shadow:0 4px 20px rgba(255,107,157,0.35); }
+    .special-banner--tomorrow { background:linear-gradient(135deg,#fffbea 0%,#fff0c0 100%); border:1.5px solid #ffd54f; }
+    .banner-emoji { font-size:40px; line-height:1; flex-shrink:0; }
+    .banner-title { font-size:17px; font-weight:800; line-height:1.3; }
+    .banner-sub { font-size:13px; margin-top:4px; }
+    .special-banner--today .banner-title { color:#fff; }
+    .special-banner--today .banner-sub { color:rgba(255,255,255,.85); }
+    .special-banner--tomorrow .banner-title { color:#7a4e00; }
+    .special-banner--tomorrow .banner-sub { color:#a06500; }
+
+    /* News tag */
+    .ni-tag { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.08em; padding:2px 9px; border-radius:20px; border:1px solid; margin-bottom:8px; }
+    .ni-source { font-size:11px; color:var(--ink3); margin-top:8px; padding-left:13px; letter-spacing:.02em; }
+
+    /* Nav dim (no prev/next) */
+    .tn-nav--dim { opacity:.3; cursor:default; }
+
+    /* Fact category badge */
+    .fact-cat-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:3px 12px; font-size:11px; font-weight:600; letter-spacing:.06em; color:rgba(255,255,255,.75); margin-bottom:14px; }
+
+    /* Fallback banner */
+    .fallback-banner { background:#7c2d12; color:#fde8d8; font-size:12px; font-weight:500; text-align:center; padding:8px 16px; letter-spacing:.02em; }
+
+    /* Footer */
+    .site-footer { max-width:720px; margin:0 auto; padding:24px 24px 52px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+    .sf-brand { display:flex; align-items:center; gap:10px; }
+    .sf-name { font-size:12px; font-weight:600; color:var(--ink3); }
+    .sf-date { font-size:11px; color:var(--ink3); margin-top:1px; }
+    .sf-links { display:flex; gap:20px; }
+    .sf-links a { font-size:12px; color:var(--ink3); text-decoration:none; transition:color .15s; }
+    .sf-links a:hover { color:var(--ink); }
+
+    /* Animations */
+    .js-animate .reveal { opacity:0; transform:translateY(16px); }
+    .js-animate .ni { opacity:0; transform:translateY(16px); }
+    .js-animate .fact-wrap { opacity:0; transform:translateY(16px); }
+    .reveal, .ni, .fact-wrap { transition:opacity .5s ease, transform .5s ease; }
+    .reveal.in, .ni.in, .fact-wrap.in { opacity:1 !important; transform:translateY(0) !important; }
+
+    /* FAB dock */
+    .fab-dock { position:fixed; bottom:28px; right:28px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+    .yuzu-fab { display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#bf9618 0%,#f5e264 42%,#c8a020 100%); color:#1b2d4f; text-decoration:none; padding:10px 18px 10px 10px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 24px rgba(160,122,18,.55),0 2px 5px rgba(0,0,0,.14); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; animation:fab-glow 3s ease-in-out infinite; }
+    .yuzu-fab:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 14px 40px rgba(160,122,18,.72),0 2px 8px rgba(0,0,0,.18); animation:none; }
+    .yuzu-fab-cam { display:flex; align-items:center; gap:12px; background:linear-gradient(145deg,#2d2d2d 0%,#1e1e1e 55%,#141414 100%); color:rgba(255,255,255,.93); text-decoration:none; padding:10px 18px 10px 10px; border-radius:50px; font-family:'DM Sans','Noto Sans TC',sans-serif; box-shadow:0 1px 0 rgba(255,255,255,.1) inset,0 6px 22px rgba(0,0,0,.45),0 2px 6px rgba(0,0,0,.2); border:1px solid rgba(255,255,255,.1); transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s; }
+    .yuzu-fab-cam:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 14px 38px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.28); color:#fff; border-color:rgba(255,255,255,.2); }
+    .yuzu-fab-icon { flex-shrink:0; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .yuzu-fab-cam .yuzu-fab-icon { background:rgba(255,255,255,.1); }
+    .yuzu-fab .yuzu-fab-icon { background:rgba(27,45,79,.16); }
+    .yuzu-fab-text { display:flex; flex-direction:column; line-height:1; }
+    .yuzu-fab-name { font-size:13px; font-weight:800; letter-spacing:.01em; }
+    .yuzu-fab-sub  { font-size:9px; font-weight:600; opacity:.55; letter-spacing:.12em; text-transform:uppercase; margin-top:3px; }
+    .yuzu-fab-arr  { font-size:16px; font-weight:300; opacity:.45; margin-left:4px; transition:transform .2s,opacity .2s; }
+    .yuzu-fab:hover .yuzu-fab-arr, .yuzu-fab-cam:hover .yuzu-fab-arr { transform:translateX(3px); opacity:.9; }
+    @keyframes fab-glow {
+      0%,100% { box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 24px rgba(160,122,18,.55),0 2px 5px rgba(0,0,0,.14); }
+      50%      { box-shadow:0 2px 0 rgba(255,255,255,.4) inset,0 6px 42px rgba(160,122,18,.82),0 2px 5px rgba(0,0,0,.14); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="rbar"></div>
+
+
+
+
+<!-- Nav -->
+<nav class="topnav">
+  <a class="tn-brand" href="index.html">
+    <svg width="36" height="36" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lg1" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg1)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8" fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="5.5"  x2="17"   y2="14.2" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="6.8" y1="22.5" x2="12.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+  <line x1="27.2" y1="22.5" x2="21.5" y2="18.5" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-linecap="round"/>
+</svg>
+    <div>
+      <div class="tn-name">Yuzu Brief</div>
+      <div class="tn-sub">Daily News</div>
+    </div>
+  </a>
+  <div class="tn-links">
+    <a class="tn-link tn-nav" href="2026-08-05.html">← 08-05</a>
+    <a class="tn-link" href="index.html">所有簡報</a>
+    <span class="tn-link tn-nav tn-nav--dim">最新 →</span>
+    <a class="tn-link" href="https://ianian22493.github.io/">回到入口</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-bg">
+    <svg viewBox="0 0 800 380" preserveAspectRatio="xMidYMid slice" fill="none">
+      <circle cx="700" cy="50" r="200" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="130" stroke="white" stroke-width="1"/>
+      <circle cx="700" cy="50" r="60"  stroke="white" stroke-width="1"/>
+      <circle cx="100" cy="320" r="150" stroke="white" stroke-width=".7"/>
+      <line x1="700" y1="50" x2="540" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="860" y2="190" stroke="white" stroke-width=".6"/>
+      <line x1="700" y1="50" x2="700" y2="230" stroke="white" stroke-width=".6"/>
+    </svg>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-layout">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Yuzu Brief · Daily News</div>
+        <div class="hero-date">
+          <span class="yr">2026年</span>
+          <span class="md">8月6日</span>
+        </div>
+        <div class="hero-weekday">
+          <span class="hero-badge">星期四</span>
+          <span class="hero-slogan">用五分鐘，掌握今天的世界</span>
+        </div>
+      </div>
+      <div class="hero-animal">🦞</div>
+    </div>
+    <div class="hero-rule"></div>
+    <div class="hero-sections">
+      <div class="hs-item hi"><span>🌍</span> 全球五大新聞</div>
+      <div class="hs-item" style="color:rgba(255,255,255,.75)"><span>🧠</span> 每日冷知識</div>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="body-wrap">
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🌍</span>
+      <span class="sec-label">全球五大新聞</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="news-list">
+
+      <div class="ni" style="--ac:#1b2d4f">
+        <div class="ni-n"><div class="ni-num">1</div></div>
+        <div class="ni-body">
+          <span class="ni-tag" style="background:#dc262618;color:#dc2626;border-color:#dc262635">衝突</span>
+          <div class="ni-title">美軍彈藥庫存嚴重枯竭，恐削弱應對未來衝突戰備能力</div>
+          <div class="ni-text">路透社與CNN引述美國官員報導，美軍在長達五個月的對伊朗戰爭中，進攻與防禦型彈藥皆面臨嚴重枯竭。其中，陸軍遠程精準導彈幾乎耗盡，「薩德」攔截導彈也消耗近八成。官員們擔憂，彈藥庫存過低的危險狀況，將嚴重削弱美軍應對未來其他衝突的戰備能力。</div>
+          <div class="ni-source">— 路透社/CNN</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#2563eb">
+        <div class="ni-n"><div class="ni-num">2</div></div>
+        <div class="ni-body">
+          <span class="ni-tag" style="background:#05966918;color:#059669;border-color:#05966935">經濟</span>
+          <div class="ni-title">📌 更新｜中東和平談判有進展，美股道瓊與標普創歷史新高</div>
+          <div class="ni-text">在卡達、巴基斯坦、阿曼等國的斡旋下，美國與伊朗之間的外交接觸已進入「非常有進展的階段」，並已交換協議草案。 受中東和平協議進展激勵，美股道瓊工業指數與標普500指數週三盤中雙雙創下歷史新高。 美國財政部長貝森特預計，荷莫茲海峽最快今日或明日就能重啟，並強調將是「自由通行」。</div>
+          <div class="ni-source">— 民視新聞網/路透社</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#0891b2">
+        <div class="ni-n"><div class="ni-num">3</div></div>
+        <div class="ni-body">
+          <span class="ni-tag" style="background:#dc262618;color:#dc2626;border-color:#dc262635">衝突</span>
+          <div class="ni-title">烏克蘭無人機攻擊裡海伊朗商船，俄烏戰爭戰略思維轉變</div>
+          <div class="ni-text">烏克蘭證實以遠程無人機攻擊裡海上的軍事相關目標，而伊朗則表示一艘伊朗商船遭到攻擊，造成一人死亡、一人受傷，並已召見烏克蘭外交代表。 此次攻擊地點位於被俄羅斯視為相對安全的後方補給區裡海，顯示烏克蘭的戰略思維已從削弱俄軍前線部隊，轉變為打擊支援俄羅斯的整個國際補給網絡。</div>
+          <div class="ni-source">— 風傳媒</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#7c3aed">
+        <div class="ni-n"><div class="ni-num">4</div></div>
+        <div class="ni-body">
+          <span class="ni-tag" style="background:#16a34a18;color:#16a34a;border-color:#16a34a35">環境</span>
+          <div class="ni-title">歐洲多國持續高溫乾旱，萊茵河水位下降「飢餓石」重現</div>
+          <div class="ni-text">今年夏季，歐洲多地連續遭遇熱浪天氣，降雨持續偏少，導致多瑙河、萊茵河等多條河流水位顯著降低。 在德國沃姆斯市，隨著萊茵河水位持續下降，多塊被稱為「飢餓石」的石刻重新露出水面，這些石塊通常只會在嚴重乾旱時期顯現，其上刻有1857年、1947年、1959年、2022年等乾旱年份，今年更新增了「2026」的刻痕，再次記錄下嚴重的乾旱狀況。</div>
+          <div class="ni-source">— 央視新聞客戶端</div>
+        </div>
+      </div>
+      <div class="ni" style="--ac:#b45309">
+        <div class="ni-n"><div class="ni-num">5</div></div>
+        <div class="ni-body">
+          <span class="ni-tag" style="background:#7c3aed18;color:#7c3aed;border-color:#7c3aed35">科技</span>
+          <div class="ni-title">非洲科技開發者轉向中國AI模型，因其開放與低成本優勢</div>
+          <div class="ni-text">《紐約時報》報導，從烏干達到肯亞，再到奈及利亞、迦納，越來越多非洲科技開發者開始選擇中國的AI模型，而非美國企業推出的產品。 中國AI模型多採「開源」方式，開發者可免費下載、調整，並根據自身需求打造新應用，其低成本和可修改的特性，使其在資源有限的發展中國家快速普及。</div>
+          <div class="ni-source">— 紐約時報</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="a-sec reveal">
+    <div class="sec-head">
+      <span class="sec-icon">🧠</span>
+      <span class="sec-label">每日冷知識</span>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="fact-wrap">
+      <div class="fact-inner">
+        <div class="fact-stripe"></div>
+        <div class="fact-content">
+          <div class="fact-kicker">Today's Fun Fact</div>
+          <div class="fact-cat-badge">⚗️ 物理與化學</div>
+          <div class="fact-title">水也能「結冰」燃燒？探索甲烷水合物的奇特現象</div>
+          <div class="fact-body">甲烷水合物，俗稱「可燃冰」，是一種在低溫高壓下形成，外觀像冰晶的化合物，但其晶體結構中卻包裹著大量甲烷氣體。當條件適當時，這些固態的「冰」會分解並釋放出甲烷，甲烷隨即被點燃，呈現出「冰塊燃燒」的奇特景象。這種物質在全球儲量豐富，被視為潛在的未來能源，但也因其不穩定性與開採技術挑戰而備受關注。</div>
+        </div>
+      </div>
+      <div class="fact-animal">🦞</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="sf-brand">
+    <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+  <defs>
+    <radialGradient id="lg2" cx="38%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#f0d050"/>
+      <stop offset="100%" stop-color="#a06010"/>
+    </radialGradient>
+  </defs>
+  <circle cx="17" cy="17" r="17" fill="url(#lg2)"/>
+  <circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2"/>
+  <circle cx="17" cy="17" r="2.8"  fill="rgba(255,255,255,.75)"/>
+  <line x1="17" y1="14.2" x2="10.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="23.5" y2="7.5"  stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="17" y1="14.2" x2="17"   y2="23"   stroke="rgba(255,255,255,.7)" stroke-width="1.4" stroke-linecap="round"/>
+</svg>
+    <div>
+      <div class="sf-name">Yuzu Brief · Daily News</div>
+      <div class="sf-date">2026-08-06</div>
+    </div>
+  </div>
+  <div class="sf-links">
+    <a href="index.html">← 所有簡報</a>
+    <a href="https://ianian22493.github.io/">回到入口 →</a>
+  </div>
+</footer>
+
+<!-- FAB dock -->
+<div class="fab-dock">
+  <a class="yuzu-fab" href="https://ianian22493.github.io/">
+    <div class="yuzu-fab-icon"><svg width="26" height="26" viewBox="0 0 34 34" fill="none"><defs><radialGradient id="fg-home" cx="38%" cy="28%" r="72%"><stop offset="0%" stop-color="#fffbe8"/><stop offset="100%" stop-color="#7a4800"/></radialGradient></defs><circle cx="17" cy="17" r="17" fill="url(#fg-home)"/><circle cx="17" cy="17" r="11.5" fill="none" stroke="rgba(27,45,79,.3)" stroke-width="1.2"/><circle cx="17" cy="17" r="2.8" fill="rgba(27,45,79,.6)"/><line x1="17" y1="14.2" x2="10.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="23.5" y2="7.5" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/><line x1="17" y1="14.2" x2="17" y2="23" stroke="rgba(27,45,79,.7)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div class="yuzu-fab-text">
+      <div class="yuzu-fab-name">回到入口</div>
+      <div class="yuzu-fab-sub">Yuzu Home</div>
+    </div>
+    <div class="yuzu-fab-arr">›</div>
+  </a>
+</div>
+
+<script>
+window.addEventListener('scroll', function() {
+  var d = document.documentElement;
+  document.getElementById('rbar').style.width =
+    Math.min((d.scrollTop / (d.scrollHeight - d.clientHeight)) * 100, 100) + '%';
+});
+
+document.body.classList.add('js-animate');
+
+var secObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('in'); secObs.unobserve(e.target); } });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(function(el) { secObs.observe(el); });
+
+var listObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.ni').forEach(function(item, i) {
+      setTimeout(function() { item.classList.add('in'); }, i * 100);
+    });
+    e.target.querySelectorAll('.fact-wrap').forEach(function(c) {
+      setTimeout(function() { c.classList.add('in'); }, 150);
+    });
+    listObs.unobserve(e.target);
+  });
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.a-sec').forEach(function(el) { listObs.observe(el); });
+
+setTimeout(function() {
+  document.querySelectorAll('.reveal:not(.in)').forEach(function(el) { el.classList.add('in'); });
+  document.querySelectorAll('.ni:not(.in)').forEach(function(el, i) {
+    setTimeout(function() { el.classList.add('in'); }, i * 60);
+  });
+  document.querySelectorAll('.fact-wrap:not(.in)').forEach(function(el) { el.classList.add('in'); });
+}, 900);
+</script>
+</body>
+</html>
