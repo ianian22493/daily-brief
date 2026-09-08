@@ -65,6 +65,7 @@ jobs:
       - name: 執行腳本
         if: steps.check.outputs.skip == 'false'
         env:
+          GEMINI_API_KEY_BRIEF: ${{ secrets.GEMINI_API_KEY_BRIEF }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BACKFILL: ${{ github.event.inputs.backfill }}
         run: python generate_brief.py

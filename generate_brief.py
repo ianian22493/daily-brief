@@ -119,9 +119,11 @@ def save_used_fact(state, date_str, fact_title, fact_category="", news_list=None
 
 
 def fetch_news(date_str, weekday_zh, used_facts_state):
-    api_key = os.environ.get("GEMINI_API_KEY")
+    # 優先用每日新聞專屬 key（獨立的每日 20 次免費額度，不與投資專案共用）；
+    # 未設定時退回共用的 GEMINI_API_KEY。
+    api_key = os.environ.get("GEMINI_API_KEY_BRIEF") or os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise RuntimeError("未設定環境變數 GEMINI_API_KEY")
+        raise RuntimeError("未設定環境變數 GEMINI_API_KEY_BRIEF / GEMINI_API_KEY")
 
     from google import genai
     from google.genai import types
