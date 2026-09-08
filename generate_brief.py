@@ -211,29 +211,29 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 
     try:
         text = try_generate(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())],
                 thinking_config=types.ThinkingConfig(thinking_budget=0)
             ),
-            label="gemini-2.5-flash+search"
+            label="gemini-3.6-flash+search"
         )
-        print("  ✓ gemini-2.5-flash + google_search")
+        print("  ✓ gemini-3.6-flash + google_search")
     except Exception as e:
-        errors.append(f"gemini-2.5-flash+search: {e}")
+        errors.append(f"gemini-3.6-flash+search: {e}")
 
     if text is None:
         try:
             text = try_generate(
-                model="gemini-2.5-flash",
+                model="gemini-3.6-flash",
                 contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）",
-                label="gemini-2.5-flash-fallback"
+                label="gemini-3.6-flash-fallback"
             )
             is_fallback = True
-            print("  ⚠ gemini-2.5-flash fallback（無搜尋）")
+            print("  ⚠ gemini-3.6-flash fallback（無搜尋）")
         except Exception as e:
-            errors.append(f"gemini-2.5-flash fallback: {e}")
+            errors.append(f"gemini-3.6-flash fallback: {e}")
 
     if text is None:
         raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
@@ -285,9 +285,9 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 
     # 重試：要求純 JSON，無搜尋
     retry_text = try_generate(
-        model="gemini-2.5-flash",
+        model="gemini-3.6-flash",
         contents=retry_prompt,
-        label="gemini-2.5-flash-json-retry"
+        label="gemini-3.6-flash-json-retry"
     )
     if retry_text is None:
         raise RuntimeError("JSON 結構重試失敗：retry_text 為空")
