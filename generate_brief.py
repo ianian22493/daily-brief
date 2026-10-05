@@ -166,6 +166,43 @@ def collect_headlines():
     return heads
 
 
+def _pub_ymd(pub):
+    from datetime import datetime
+    for f in ("%a, %d %b %Y %H:%M:%S %Z", "%a, %d %b %Y %H:%M:%S %z"):
+        try:
+            return datetime.strptime(pub, f).strftime("%Y-%m-%d")
+        except Exception:
+            pass
+    return None
+
+
+# 回填用的分類搜尋（涵蓋每日簡報的五大類）
+BACKFILL_QUERIES = [
+    ("國際 OR 政治 OR 外交",   "國際"),
+    ("經濟 OR 財經 OR 股市",   "財經"),
+    ("科技 OR AI OR 半導體",   "科技"),
+    ("台灣 OR 兩岸",           "台灣"),
+    ("衝突 OR 戰爭 OR 襲擊",   "衝突"),
+    ("社會 OR 事故 OR 災害",   "社會"),
+]
+
+
+def collect_headlines_for_date(ymd):
+    """回填用：抓某一天(ymd='YYYY-MM-DD')真正發佈的真實標題（依 pubDate 過濾）。"""
+    import time, urllib.parse
+    heads, seen = [], set()
+    for q, label in BACKFILL_QUERIES:
+        url = ("https://news.google.com/rss/search?q="
+               + urllib.parse.quote(q + " when:14d")
+               + "&hl=zh-TW&gl=TW&ceid=TW:zh-Hant")
+        for h in _rss_items(url, 60):
+            if h["title"] and h["title"] not in seen and _pub_ymd(h["pub"]) == ymd:
+                seen.add(h["title"])
+                heads.append({**h, "topic": label})
+        time.sleep(0.2)
+    return heads
+
+
 def fetch_news(date_str, weekday_zh, used_facts_state, headlines=None):
     # 優先用每日新聞專屬 key（獨立的每日 20 次免費額度，不與投資專案共用）；
     # 未設定時退回共用的 GEMINI_API_KEY。
@@ -1254,7 +1291,61 @@ def backfill_all(repo_dir="."):
 # ════════════════════════════════════════════════════════════════════
 # 主程式
 # ════════════════════════════════════════════════════════════════════
+def backfill_news_dates(dates):
+    """回填指定日期：各日用『那天真正發佈』的真實 RSS 文章重建 brief 頁面。"""
+    state = load_used_facts()
+    done, skipped = [], []
+    for ymd in dates:
+        dt      = datetime.strptime(ymd, "%Y-%m-%d")
+        weekday = WEEKDAY_ZH[dt.weekday()]
+        print(f"🔁 回填 {ymd}（星期{weekday}）")
+        # 已是真實內容（無降級橫幅）就略過，讓重跑能接續未完成的（省額度）
+        fpath = f"{ymd}.html"
+        if os.path.exists(fpath):
+            try:
+                if "fallback-banner" not in open(fpath, encoding="utf-8").read():
+                    print(f"  ✔ {ymd} 已是真實內容，略過"); continue
+            except Exception:
+                pass
+        heads = collect_headlines_for_date(ymd)
+        real  = [h for h in heads if h.get("title")]
+        if len(real) < 5:
+            print(f"  ⏭ {ymd} 當天真實標題僅 {len(real)} 則，跳過（請手動補）")
+            skipped.append(ymd); continue
+        try:
+            data = fetch_news(ymd, weekday, state, headlines=heads)
+        except Exception as e:
+            print(f"  ✗ {ymd} 生成失敗：{e}，跳過")
+            skipped.append(ymd); continue
+        all_dates = sorted({f[:10] for f in os.listdir(".")
+                            if re.match(r"^\d{4}-\d{2}-\d{2}\.html$", f)} | set(dates))
+        i = all_dates.index(ymd)
+        prev_date = all_dates[i - 1] if i > 0 else None
+        next_date = all_dates[i + 1] if i < len(all_dates) - 1 else None
+        with open(f"{ymd}.html", "w", encoding="utf-8") as f:
+            f.write(build_brief_html(data, dt, prev_date, next_date))
+        save_used_fact(state, ymd, data['fact']['title'],
+                       data['fact'].get('category', ''), data.get('news', []))
+        done.append(ymd)
+        print(f"  ✓ {ymd}.html 已用真實新聞重建（{len(data['news'])} 則）")
+
+    index_html = build_index_html(".")
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(index_html)
+    print(f"✅ 回填完成：成功 {len(done)} 天 {done}；跳過 {len(skipped)} 天 {skipped}")
+
+
 def main():
+    # 若設定 BACKFILL_NEWS=true，回填最近 N 天的『內容』（用真實 RSS 重建）
+    if os.environ.get("BACKFILL_NEWS") == "true":
+        from datetime import timedelta
+        n     = int(os.environ.get("BACKFILL_NEWS_DAYS", "14"))
+        today = datetime.now(TZ_TW).date()
+        dates = sorted((today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(n))
+        print(f"🔁 BACKFILL_NEWS 模式：回填最近 {n} 天（{dates[0]} ~ {dates[-1]}）")
+        backfill_news_dates(dates)
+        return
+
     # 若設定 BACKFILL=true，只補跑舊文章設計，不呼叫 Gemini
     if os.environ.get("BACKFILL") == "true":
         backfill_all(".")

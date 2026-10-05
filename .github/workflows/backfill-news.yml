@@ -1,0 +1,46 @@
+name: 回填每日新聞（真實 RSS 重建）
+
+# 手動用：把最近 N 天降級(無搜尋)的每日新聞，用『那幾天真正發佈的真實文章』重建。
+# 可重複執行：已重建好的日子會自動略過（省免費額度）。
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '回填最近幾天（RSS 可回溯約 14 天）'
+        default: '14'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安裝依賴
+        run: pip install google-genai requests
+
+      - name: 回填（真實 RSS + Gemini 整理）
+        env:
+          BACKFILL_NEWS: "true"
+          BACKFILL_NEWS_DAYS: ${{ github.event.inputs.days || '14' }}
+          GEMINI_API_KEY_BRIEF: ${{ secrets.GEMINI_API_KEY_BRIEF }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python generate_brief.py
+
+      - name: Commit 並 Push
+        run: |
+          git config user.email "bot@daily-brief"
+          git config user.name "Daily Brief Bot"
+          git add -A
+          git diff --cached --quiet || git commit -m "🔁 回填每日新聞（真實 RSS 重建）$(date -u +'%Y-%m-%d')"
+          git pull --rebase
+          git push
