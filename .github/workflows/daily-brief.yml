@@ -60,7 +60,7 @@ jobs:
 
       - name: 安裝依賴
         if: steps.check.outputs.skip == 'false'
-        run: pip install google-genai
+        run: pip install google-genai requests
 
       - name: 執行腳本
         if: steps.check.outputs.skip == 'false'

@@ -118,7 +118,55 @@ def save_used_fact(state, date_str, fact_title, fact_category="", news_list=None
         json.dump(state, f, ensure_ascii=False, indent=2)
 
 
-def fetch_news(date_str, weekday_zh, used_facts_state):
+# ════════════════════════════════════════════════════════════════════
+# Google News RSS：抓「真實」新聞標題（取代已失效的免費 grounding）
+# ════════════════════════════════════════════════════════════════════
+_GNEWS_UA   = {"User-Agent": "Mozilla/5.0 (compatible; YuzuBriefBot/1.0)"}
+NEWS_TOPICS = [
+    ("WORLD",      "國際"),
+    ("NATION",     "台灣"),
+    ("BUSINESS",   "財經"),
+    ("TECHNOLOGY", "科技"),
+    ("SCIENCE",    "科學"),
+    ("HEALTH",     "健康"),
+]
+
+
+def _rss_items(url, limit=8):
+    import requests, xml.etree.ElementTree as ET
+    out = []
+    try:
+        r = requests.get(url, timeout=15, headers=_GNEWS_UA)
+        r.raise_for_status()
+        root = ET.fromstring(r.content)
+        for it in root.findall(".//item")[:limit]:
+            t = (it.findtext("title") or "").strip()
+            if t:
+                out.append({
+                    "title":  t,
+                    "pub":    (it.findtext("pubDate") or "").strip(),
+                    "source": (it.findtext("source") or "").strip(),
+                })
+    except Exception as e:
+        print(f"    ✗ RSS 失敗：{e}")
+    return out
+
+
+def collect_headlines():
+    """從 Google News 各分類 RSS 抓今天的真實頭條。"""
+    import time
+    heads = []
+    for topic, label in NEWS_TOPICS:
+        url = (f"https://news.google.com/rss/headlines/section/topic/{topic}"
+               f"?hl=zh-TW&gl=TW&ceid=TW:zh-Hant")
+        for h in _rss_items(url, 8):
+            heads.append({**h, "topic": label})
+        time.sleep(0.2)
+    print(f"  📥 Google News RSS 取得 {len(heads)} 則真實標題（{len(NEWS_TOPICS)} 類）")
+    return heads
+
+
+def fetch_news(date_str, weekday_zh, used_facts_state, headlines=None):
     # 優先用每日新聞專屬 key（獨立的每日 20 次免費額度，不與投資專案共用）；
     # 未設定時退回共用的 GEMINI_API_KEY。
     api_key = os.environ.get("GEMINI_API_KEY_BRIEF") or os.environ.get("GEMINI_API_KEY")
@@ -128,6 +176,17 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
     from google import genai
     from google.genai import types
     client = genai.Client(api_key=api_key)
+
+    # 抓真實新聞標題（新聞一律來自真實 RSS，Gemini 只做整理、不聯網、不編造）
+    if headlines is None:
+        headlines = collect_headlines()
+    real = [h for h in headlines if h.get("title")]
+    if len(real) < 6:
+        raise RuntimeError(f"RSS 真實標題不足（{len(real)} 則），今日不產出以免生出假新聞")
+    headlines_text = "\n".join(
+        f"[{h.get('topic','')}｜{h.get('source','') or 'Google News'}] {h['title']}"
+        for h in real
+    )
 
     all_facts      = used_facts_state.get("facts", [])
     fact_count     = len(all_facts)
@@ -155,7 +214,11 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 
     prompt = f"""今天是 {date_str}（星期{weekday_zh}）。
 
-你是繁體中文新聞編輯，請搜尋今天（{date_str}）最新的國際新聞，撰寫每日簡報。
+以下是今天來自 Google News 的「真實新聞標題」（每行一則，格式：[分類｜來源] 標題）：
+
+{headlines_text}
+
+你是繁體中文新聞編輯，請根據上面的真實標題撰寫每日簡報（新聞只能來自這些標題，不得自行編造）。
 
 ═══════════════════════════════════════
 【今日冷知識類別（必須嚴格遵守）】
@@ -166,16 +229,16 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
 {avoid_block}═══════════════════════════════════════
 
 任務：
-1. 選出今天最重要的 5 則全球新聞（涵蓋政治、衝突、經濟、社會、科技，優先選有即時新聞的）
+1. 從上面的真實標題中，挑出今天最重要的 5 則全球新聞（盡量涵蓋政治、衝突、經濟、社會、科技；地理至少 3 區；台灣/亞洲相關至少 1 則）
 2. 撰寫 1 則有趣的冷知識，類別必須是「{today_category}」，且不得與上方禁止清單重複
 
 新聞格式要求：
 - 標題：15–30 字，精確描述事件核心，主詞清楚
-- 內文：2–4 句話，說明背景、事件經過與影響
+- 內文：2–3 句繁中，只根據上面標題把事件說清楚；嚴禁加入標題裡沒有的數字、金額、引述或結論，標題若無細節就寫概括
 - 使用繁體中文，語氣中立客觀
 - 若為昨日已報導但今日有新進展的事件，標題前加「📌 更新｜」
 - 每則新聞加上 tag 欄位，從以下選一個最符合的：政治、經濟、科技、衝突、社會、外交、環境、健康、其他
-- 每則新聞加上 source 欄位，填入報導來源媒體的中文簡稱（如：路透社、BBC、彭博、法新社、AP、CNN、紐時、衛報等）
+- 每則新聞加上 source 欄位，使用該標題旁括號內的真實來源（若無則填「Google News」）
 - 地理多元性：5 則新聞需涵蓋至少 3 個不同地區（亞洲、歐洲、美洲、中東、非洲等），避免集中於單一地區
 - 台灣優先：若當天有重要的台灣、亞洲或兩岸關係相關新聞，5 則中至少 1 則應優先選取
 
@@ -198,45 +261,25 @@ def fetch_news(date_str, weekday_zh, used_facts_state):
                 return resp.text
             except Exception as e:
                 msg = str(e)
-                if "503" in msg and attempt < 4:
-                    wait = 20 * (attempt + 1)
-                    print(f"  ⏳ {label} 503 繁忙，{wait}秒後重試（第{attempt+1}次）...")
+                if ("503" in msg or "429" in msg) and attempt < 4:
+                    wait = 25 * (attempt + 1)
+                    print(f"  ⏳ {label} {('429' if '429' in msg else '503')} 限制，{wait}秒後重試（第{attempt+1}次）...")
                     time.sleep(wait)
                 else:
                     raise
 
-    text = None
+    # 用 Gemini 整理真實標題（不使用 grounding；新聞來自真實 RSS、冷知識為常識）
     is_fallback = False
-    errors = []
-
-    try:
-        text = try_generate(
-            model="gemini-3.6-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                thinking_config=types.ThinkingConfig(thinking_budget=0)
-            ),
-            label="gemini-3.6-flash+search"
-        )
-        print("  ✓ gemini-3.6-flash + google_search")
-    except Exception as e:
-        errors.append(f"gemini-3.6-flash+search: {e}")
-
+    text = try_generate(
+        model="gemini-3.6-flash",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(thinking_budget=0)
+        ),
+        label="gemini-3.6-flash-rss"
+    )
     if text is None:
-        try:
-            text = try_generate(
-                model="gemini-3.6-flash",
-                contents=prompt + "\n\n（本次無法搜尋最新資料，請以訓練資料中最近的知識回答，每則標題末加上「⚠️」）",
-                label="gemini-3.6-flash-fallback"
-            )
-            is_fallback = True
-            print("  ⚠ gemini-3.6-flash fallback（無搜尋）")
-        except Exception as e:
-            errors.append(f"gemini-3.6-flash fallback: {e}")
-
-    if text is None:
-        raise RuntimeError("所有 Gemini 嘗試均失敗：" + "; ".join(errors))
+        raise RuntimeError("Gemini 整理失敗（text 為空）")
 
     text = re.sub(r"^```json\s*", "", text.strip(), flags=re.MULTILINE)
     text = re.sub(r"^```\s*",     "", text,          flags=re.MULTILINE)
