@@ -1303,7 +1303,9 @@ def backfill_news_dates(dates):
         fpath = f"{ymd}.html"
         if os.path.exists(fpath):
             try:
-                if "fallback-banner" not in open(fpath, encoding="utf-8").read():
+                # 只有真正渲染出的橫幅 <div class="fallback-banner"> 才算降級；
+                # CSS 規則 .fallback-banner{...} 每頁都有，不能當判準
+                if 'class="fallback-banner"' not in open(fpath, encoding="utf-8").read():
                     print(f"  ✔ {ymd} 已是真實內容，略過"); continue
             except Exception:
                 pass
