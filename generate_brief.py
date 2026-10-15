@@ -289,7 +289,8 @@ def fetch_news(date_str, weekday_zh, used_facts_state, headlines=None):
     import time
 
     def try_generate(model, contents, config=None, label=""):
-        for attempt in range(5):
+        tries = 7
+        for attempt in range(tries):
             try:
                 if config:
                     resp = client.models.generate_content(model=model, contents=contents, config=config)
@@ -298,8 +299,8 @@ def fetch_news(date_str, weekday_zh, used_facts_state, headlines=None):
                 return resp.text
             except Exception as e:
                 msg = str(e)
-                if ("503" in msg or "429" in msg) and attempt < 4:
-                    wait = 25 * (attempt + 1)
+                if ("503" in msg or "429" in msg) and attempt < tries - 1:
+                    wait = 30 * (attempt + 1)   # 30,60,90,120,150,180 秒（撐過較久的過載尖峰）
                     print(f"  ⏳ {label} {('429' if '429' in msg else '503')} 限制，{wait}秒後重試（第{attempt+1}次）...")
                     time.sleep(wait)
                 else:
